@@ -1,5 +1,9 @@
 import React from 'react';
 import { StyleSheet, Text, View, ScrollView } from 'react-native';
+import { Colors } from '../../constants/Colors';
+import { Spacing } from '../../constants/Spacing';
+import { Typography } from '../../constants/Typography';
+import { formatDateForDisplay } from '../../utils/dateUtils';
 
 export default function OracaoDiariaScreen() {
   return (
@@ -8,12 +12,7 @@ export default function OracaoDiariaScreen() {
         {/* Cabeçalho da tela */}
         <View style={styles.header}>
           <Text style={styles.date}>
-            {new Date().toLocaleDateString('pt-BR', {
-              weekday: 'long',
-              year: 'numeric',
-              month: 'long',
-              day: 'numeric'
-            })}
+            {formatDateForDisplay(new Date())}
           </Text>
         </View>
 
@@ -45,31 +44,30 @@ export default function OracaoDiariaScreen() {
   );
 }
 
-// Estilos do componente
+// Estilos do componente usando constantes padronizadas
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#f8f9fa',
+    backgroundColor: Colors.background,
   },
   content: {
-    padding: 20,
+    padding: Spacing.screenPadding,
   },
   header: {
-    marginBottom: 20,
+    marginBottom: Spacing.xl,
     alignItems: 'center',
   },
   date: {
-    fontSize: 16,
-    color: '#6c757d',
+    ...Typography.styles.dateText,
+    color: Colors.textSecondary,
     textTransform: 'capitalize',
-    fontWeight: '500',
   },
   prayerCard: {
-    backgroundColor: '#ffffff',
-    borderRadius: 12,
-    padding: 20,
-    marginBottom: 20,
-    shadowColor: '#000',
+    backgroundColor: Colors.cardBackground,
+    borderRadius: Spacing.borderRadius,
+    padding: Spacing.cardPadding,
+    marginBottom: Spacing.xl,
+    shadowColor: Colors.shadow,
     shadowOffset: {
       width: 0,
       height: 2,
@@ -79,31 +77,29 @@ const styles = StyleSheet.create({
     elevation: 3,
   },
   prayerTitle: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    color: '#2c3e50',
+    ...Typography.styles.cardTitle,
+    color: Colors.primary,
     textAlign: 'center',
-    marginBottom: 15,
+    marginBottom: Spacing.md,
   },
   prayerText: {
-    fontSize: 16,
-    lineHeight: 24,
-    color: '#495057',
+    ...Typography.styles.prayerText,
+    color: Colors.textPrimary,
     textAlign: 'justify',
   },
   statusArea: {
     alignItems: 'center',
-    marginTop: 20,
+    marginTop: Spacing.xl,
   },
   statusText: {
-    fontSize: 14,
-    color: '#28a745',
-    fontWeight: 'bold',
-    marginBottom: 5,
+    fontSize: Typography.fontSize.sm,
+    color: Colors.success,
+    fontWeight: Typography.fontWeight.bold,
+    marginBottom: Spacing.xs,
   },
   versionText: {
-    fontSize: 12,
-    color: '#6c757d',
+    fontSize: Typography.fontSize.xs,
+    color: Colors.textLight,
     fontStyle: 'italic',
   },
 });
