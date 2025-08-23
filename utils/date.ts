@@ -7,6 +7,26 @@ export const getCurrentDate = (): string => {
     const now = new Date();
     return now.toISOString().split('T')[0];
   };
+
+/**
+ * Obtém a data atual no formato YYYY-MM-DD (alias para getCurrentDate)
+ */
+export const todayKey = (): string => {
+    return getCurrentDate();
+  };
+
+/**
+ * Formata uma data de forma humanizada em português
+ * Exemplo: "segunda-feira, 23 de agosto de 2025"
+ */
+export const formatHuman = (date: Date): string => {
+    return date.toLocaleDateString('pt-BR', {
+      weekday: 'long',
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric'
+    });
+  };
   
   /**
    * Formata uma data para exibição em português
@@ -114,3 +134,4 @@ export const getCurrentDate = (): string => {
     
     return Math.abs(hash);
   };
+  

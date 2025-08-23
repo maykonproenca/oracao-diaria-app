@@ -1,105 +1,87 @@
+// app/(tabs)/index.tsx
+// Tela principal: carrega a oração do dia, exibe stats e permite marcar como orada.
+// Inclui tratamento de loading e erros.
+
+import ErrorState from '@/components/ErrorState';
+import PrayerCard from '@/components/PrayerCard';
+import { useTodayPrayer } from '@/hooks/useTodayPrayer';
+import { formatHuman } from '@/utils/date';
 import React from 'react';
-import { StyleSheet, Text, View, ScrollView } from 'react-native';
-import { Colors } from '../../constants/Colors';
-import { Spacing } from '../../constants/Spacing';
-import { Typography } from '../../constants/Typography';
-import { formatDateForDisplay } from '../../utils/dateUtils';
+import { ActivityIndicator, RefreshControl, ScrollView, Text, useColorScheme, View } from 'react-native';
 
-export default function OracaoDiariaScreen() {
-  return (
-    <ScrollView style={styles.container}>
-      <View style={styles.content}>
-        {/* Cabeçalho da tela */}
-        <View style={styles.header}>
-          <Text style={styles.date}>
-            {formatDateForDisplay(new Date())}
-          </Text>
-        </View>
+export default function IndexScreen() {
+  const { loading, error, data, stats, actionLoading, reload, complete } = useTodayPrayer();
+  const colorScheme = useColorScheme();
+  const isDark = colorScheme === 'dark';
 
-        {/* Área da oração */}
-        <View style={styles.prayerCard}>
-          <Text style={styles.prayerTitle}>Oração do Dia</Text>
-          <Text style={styles.prayerText}>
-            "Senhor, neste novo dia que se inicia, venho à Tua presença com um coração 
-            grato e cheio de esperança. Reconheço que és o autor da minha vida e que 
-            todos os meus caminhos estão em Tuas mãos.{'\n\n'}
-            
-            Peço que me concedas sabedoria para tomar as decisões certas, força para 
-            enfrentar os desafios que surgirem e paz para descansar em Tua vontade. 
-            Que eu possa ser uma bênção na vida daqueles que cruzarem meu caminho 
-            hoje.{'\n\n'}
-            
-            Obrigado por Tua fidelidade que se renova a cada manhã. Em nome de Jesus, 
-            amém."
-          </Text>
-        </View>
-
-        {/* Área de status */}
-        <View style={styles.statusArea}>
-          <Text style={styles.statusText}>✅ Configuração atualizada 2024</Text>
-          <Text style={styles.versionText}>Versão MVP 1.0 - Expo Router + TypeScript</Text>
-        </View>
+  if (loading) {
+    return (
+      <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center', gap: 12 }}>
+        <ActivityIndicator />
+        <Text style={{ opacity: 0.8 }}>Carregando oração do dia...</Text>
       </View>
+    );
+  }
+
+  if (error) {
+    return (
+      <ScrollView
+        contentContainerStyle={{ flexGrow: 1, justifyContent: 'center', padding: 16 }}
+        refreshControl={<RefreshControl refreshing={false} onRefresh={reload} />}
+      >
+        <ErrorState message={error} onRetry={reload} />
+      </ScrollView>
+    );
+  }
+
+  const dateText = data?.dateKey ? formatHuman(new Date(data.dateKey + 'T00:00:00')) : '';
+
+  return (
+    <ScrollView
+      style={{ flex: 1, backgroundColor: isDark ? '#0b1220' : '#f8fafc' }}
+      contentContainerStyle={{ padding: 16, gap: 16 }}
+      refreshControl={<RefreshControl refreshing={false} onRefresh={reload} />}
+    >
+      {/* Cabeçalho com data e título */}
+      <View style={{ gap: 4 }}>
+        <Text style={{ fontSize: 13, opacity: 0.7 }}>Hoje • {dateText}</Text>
+        <Text style={{ fontSize: 20, fontWeight: '800' }}>Oração Diária</Text>
+      </View>
+
+      {/* Card com a oração */}
+      <PrayerCard
+        title={data?.prayer?.title ?? 'Oração do Dia'}
+        content={data?.prayer?.content ?? 'Sem orações no banco ainda. Popule a tabela "prayers".'}
+        completed={Boolean(data?.completed)}
+        loadingAction={actionLoading}
+        onComplete={complete}
+      />
+
+      {/* Estatísticas */}
+      <View
+        style={{
+          backgroundColor: isDark ? '#111827' : '#FFFFFF',
+          borderColor: isDark ? '#1f2937' : '#e5e7eb',
+          borderWidth: 1,
+          borderRadius: 12,
+          padding: 16,
+          gap: 8,
+        }}
+      >
+        <Text style={{ fontSize: 16, fontWeight: '700' }}>Seu progresso</Text>
+        <Text style={{ fontSize: 14 }}>Streak atual: <Text style={{ fontWeight: '700' }}>{stats?.currentStreak ?? 0}</Text> dia(s)</Text>
+        <Text style={{ fontSize: 14 }}>Maior streak: <Text style={{ fontWeight: '700' }}>{stats?.longestStreak ?? 0}</Text> dia(s)</Text>
+        <Text style={{ fontSize: 14 }}>Total de orações concluídas: <Text style={{ fontWeight: '700' }}>{stats?.totalCompleted ?? 0}</Text></Text>
+      </View>
+
+      {/* Dica caso não haja conteúdo */}
+      {!data?.prayer?.content && (
+        <View style={{ padding: 12 }}>
+          <Text style={{ fontSize: 13, opacity: 0.8 }}>
+            Dica: insira orações na tabela "prayers" ou importe um seed inicial.
+          </Text>
+        </View>
+      )}
     </ScrollView>
   );
 }
-
-// Estilos do componente usando constantes padronizadas
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: Colors.background,
-  },
-  content: {
-    padding: Spacing.screenPadding,
-  },
-  header: {
-    marginBottom: Spacing.xl,
-    alignItems: 'center',
-  },
-  date: {
-    ...Typography.styles.dateText,
-    color: Colors.textSecondary,
-    textTransform: 'capitalize',
-  },
-  prayerCard: {
-    backgroundColor: Colors.cardBackground,
-    borderRadius: Spacing.borderRadius,
-    padding: Spacing.cardPadding,
-    marginBottom: Spacing.xl,
-    shadowColor: Colors.shadow,
-    shadowOffset: {
-      width: 0,
-      height: 2,
-    },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 3,
-  },
-  prayerTitle: {
-    ...Typography.styles.cardTitle,
-    color: Colors.primary,
-    textAlign: 'center',
-    marginBottom: Spacing.md,
-  },
-  prayerText: {
-    ...Typography.styles.prayerText,
-    color: Colors.textPrimary,
-    textAlign: 'justify',
-  },
-  statusArea: {
-    alignItems: 'center',
-    marginTop: Spacing.xl,
-  },
-  statusText: {
-    fontSize: Typography.fontSize.sm,
-    color: Colors.success,
-    fontWeight: Typography.fontWeight.bold,
-    marginBottom: Spacing.xs,
-  },
-  versionText: {
-    fontSize: Typography.fontSize.xs,
-    color: Colors.textLight,
-    fontStyle: 'italic',
-  },
-});
