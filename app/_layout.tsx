@@ -1,29 +1,29 @@
-import { DarkTheme, DefaultTheme, ThemeProvider } from '@react-navigation/native';
-import { useFonts } from 'expo-font';
 import { Stack } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
-import 'react-native-reanimated';
-
-import { useColorScheme } from '@/hooks/useColorScheme';
 
 export default function RootLayout() {
-  const colorScheme = useColorScheme();
-  const [loaded] = useFonts({
-    SpaceMono: require('../assets/fonts/SpaceMono-Regular.ttf'),
-  });
-
-  if (!loaded) {
-    // Async font loading only occurs in development.
-    return null;
-  }
-
   return (
-    <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
+    <>
+      {/* Configuração da navegação principal */}
       <Stack>
-        <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-        <Stack.Screen name="+not-found" />
+        <Stack.Screen 
+          name="(tabs)" 
+          options={{ headerShown: false }} 
+        />
+        <Stack.Screen 
+          name="+not-found" 
+          options={{ title: 'Página não encontrada' }} 
+        />
       </Stack>
+      
+      {/* StatusBar define a cor da barra de status do celular */}
       <StatusBar style="auto" />
-    </ThemeProvider>
+    </>
   );
 }
+
+// Comentários explicativos:
+// - Stack: Sistema de navegação em pilha (uma tela sobre a outra)
+// - (tabs): Pasta que contém as abas principais do app
+// - headerShown: false: Remove o cabeçalho padrão das telas
+// - StatusBar: Controla a aparência da barra superior do celular
