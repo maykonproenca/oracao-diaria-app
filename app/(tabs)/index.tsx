@@ -1,33 +1,72 @@
 // app/(tabs)/index.tsx
-// Tela principal: carrega a oração do dia, exibe stats e permite marcar como orada.
-// Inclui tratamento de loading e erros.
+// Tela principal com feedback via Toasts e estados consistentes.
 
-import ErrorState from '@/components/ErrorState';
-import PrayerCard from '@/components/PrayerCard';
+import React, { useCallback } from 'react';
+import { ScrollView, View, ActivityIndicator, RefreshControl } from 'react-native';
 import { useTodayPrayer } from '@/hooks/useTodayPrayer';
+import PrayerCard from '@/components/PrayerCard';
+import ErrorState from '@/components/ErrorState';
 import { formatHuman } from '@/utils/date';
-import React from 'react';
-import { ActivityIndicator, RefreshControl, ScrollView, Text, useColorScheme, View } from 'react-native';
+import { buildShareMessage, shareSystem, shareWhatsApp } from '@/services/shareService';
+import { ThemedText, ThemedView, useTheme } from '@/components/ui/Themed';
+import { useToast } from '@/components/ui/ToastProvider';
 
 export default function IndexScreen() {
   const { loading, error, data, stats, actionLoading, reload, complete } = useTodayPrayer();
-  const colorScheme = useColorScheme();
-  const isDark = colorScheme === 'dark';
+  const { colors, spacing, radius } = useTheme();
+  const toast = useToast();
+
+  const onShare = useCallback(async () => {
+    try {
+      const msg = buildShareMessage({
+        title: data?.prayer?.title ?? 'Oração do dia',
+        content: data?.prayer?.content ?? '',
+        includeLink: true,
+      });
+      await shareSystem(msg);
+      toast.show({ type: 'success', message: 'Compartilhado!' });
+    } catch (e: any) {
+      toast.show({ type: 'error', message: e?.message ?? 'Falha ao compartilhar.' });
+    }
+  }, [data?.prayer?.title, data?.prayer?.content, toast]);
+
+  const onShareWA = useCallback(async () => {
+    try {
+      const msg = buildShareMessage({
+        title: data?.prayer?.title ?? 'Oração do dia',
+        content: data?.prayer?.content ?? '',
+        includeLink: true,
+      });
+      await shareWhatsApp(msg);
+    } catch (e: any) {
+      toast.show({ type: 'error', message: e?.message ?? 'Falha ao abrir o WhatsApp.' });
+    }
+  }, [data?.prayer?.title, data?.prayer?.content, toast]);
+
+  const onComplete = useCallback(async () => {
+    try {
+      await complete();
+      toast.show({ type: 'success', message: 'Oração marcada como concluída.' });
+    } catch (e: any) {
+      toast.show({ type: 'error', message: e?.message ?? 'Falha ao concluir.' });
+    }
+  }, [complete, toast]);
 
   if (loading) {
     return (
-      <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center', gap: 12 }}>
+      <ThemedView style={{ flex: 1, alignItems: 'center', justifyContent: 'center', gap: spacing(3) }}>
         <ActivityIndicator />
-        <Text style={{ opacity: 0.8 }}>Carregando oração do dia...</Text>
-      </View>
+        <ThemedText tone="muted">Carregando oração do dia...</ThemedText>
+      </ThemedView>
     );
   }
 
   if (error) {
     return (
       <ScrollView
-        contentContainerStyle={{ flexGrow: 1, justifyContent: 'center', padding: 16 }}
+        contentContainerStyle={{ flexGrow: 1, justifyContent: 'center', padding: spacing(4) }}
         refreshControl={<RefreshControl refreshing={false} onRefresh={reload} />}
+        style={{ backgroundColor: colors.background }}
       >
         <ErrorState message={error} onRetry={reload} />
       </ScrollView>
@@ -38,48 +77,49 @@ export default function IndexScreen() {
 
   return (
     <ScrollView
-      style={{ flex: 1, backgroundColor: isDark ? '#0b1220' : '#f8fafc' }}
-      contentContainerStyle={{ padding: 16, gap: 16 }}
+      style={{ flex: 1, backgroundColor: colors.background }}
+      contentContainerStyle={{ padding: spacing(4), gap: spacing(4) }}
       refreshControl={<RefreshControl refreshing={false} onRefresh={reload} />}
     >
-      {/* Cabeçalho com data e título */}
-      <View style={{ gap: 4 }}>
-        <Text style={{ fontSize: 13, opacity: 0.7 }}>Hoje • {dateText}</Text>
-        <Text style={{ fontSize: 20, fontWeight: '800' }}>Oração Diária</Text>
+      {/* Cabeçalho */}
+      <View style={{ gap: spacing(1) }}>
+        <ThemedText size="small" tone="muted">Hoje • {dateText}</ThemedText>
+        <ThemedText size="title" weight="800">Oração Diária</ThemedText>
       </View>
 
-      {/* Card com a oração */}
+      {/* Card da oração + ações */}
       <PrayerCard
         title={data?.prayer?.title ?? 'Oração do Dia'}
         content={data?.prayer?.content ?? 'Sem orações no banco ainda. Popule a tabela "prayers".'}
         completed={Boolean(data?.completed)}
         loadingAction={actionLoading}
-        onComplete={complete}
+        onComplete={onComplete}
+        onShare={data?.prayer?.content ? onShare : undefined}
+        onShareWhatsApp={data?.prayer?.content ? onShareWA : undefined}
       />
 
       {/* Estatísticas */}
       <View
         style={{
-          backgroundColor: isDark ? '#111827' : '#FFFFFF',
-          borderColor: isDark ? '#1f2937' : '#e5e7eb',
+          backgroundColor: colors.surface,
+          borderColor: colors.border,
           borderWidth: 1,
-          borderRadius: 12,
-          padding: 16,
-          gap: 8,
+          borderRadius: radius.md,
+          padding: spacing(4),
+          gap: spacing(2),
         }}
       >
-        <Text style={{ fontSize: 16, fontWeight: '700' }}>Seu progresso</Text>
-        <Text style={{ fontSize: 14 }}>Streak atual: <Text style={{ fontWeight: '700' }}>{stats?.currentStreak ?? 0}</Text> dia(s)</Text>
-        <Text style={{ fontSize: 14 }}>Maior streak: <Text style={{ fontWeight: '700' }}>{stats?.longestStreak ?? 0}</Text> dia(s)</Text>
-        <Text style={{ fontSize: 14 }}>Total de orações concluídas: <Text style={{ fontWeight: '700' }}>{stats?.totalCompleted ?? 0}</Text></Text>
+        <ThemedText size="h2" weight="800">Seu progresso</ThemedText>
+        <ThemedText>Streak atual: <ThemedText weight="800">{stats?.currentStreak ?? 0}</ThemedText> dia(s)</ThemedText>
+        <ThemedText>Maior streak: <ThemedText weight="800">{stats?.longestStreak ?? 0}</ThemedText> dia(s)</ThemedText>
+        <ThemedText>Total concluídas: <ThemedText weight="800">{stats?.totalCompleted ?? 0}</ThemedText></ThemedText>
       </View>
 
-      {/* Dica caso não haja conteúdo */}
       {!data?.prayer?.content && (
-        <View style={{ padding: 12 }}>
-          <Text style={{ fontSize: 13, opacity: 0.8 }}>
+        <View style={{ padding: spacing(3) }}>
+          <ThemedText tone="muted" size="small">
             Dica: insira orações na tabela "prayers" ou importe um seed inicial.
-          </Text>
+          </ThemedText>
         </View>
       )}
     </ScrollView>

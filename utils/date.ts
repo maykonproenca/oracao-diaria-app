@@ -1,137 +1,94 @@
-// Funções utilitárias para manipulação de datas
+// utils/date.ts
+// Utilitários de data para o app: chaves YYYY-MM-DD, matriz mensal e helpers.
+// Mantemos funções puras para facilitar teste e reuso.
+
+export function todayKey(date = new Date()): string {
+  const y = date.getFullYear();
+  const m = String(date.getMonth() + 1).padStart(2, '0');
+  const d = String(date.getDate()).padStart(2, '0');
+  return `${y}-${m}-${d}`;
+}
+
+export function keyToDate(key: string): Date {
+  // Espera 'YYYY-MM-DD'
+  const [y, m, d] = key.split('-').map(Number);
+  return new Date(y, (m - 1), d);
+}
+
+export function formatHuman(date: Date): string {
+  const d = String(date.getDate()).padStart(2, '0');
+  const m = String(date.getMonth() + 1).padStart(2, '0');
+  const y = date.getFullYear();
+  return `${d}/${m}/${y}`;
+}
+
+export function addDays(base: Date, delta: number): Date {
+  const copy = new Date(base);
+  copy.setDate(copy.getDate() + delta);
+  return copy;
+}
+
+export function startOfMonth(date: Date): Date {
+  return new Date(date.getFullYear(), date.getMonth(), 1);
+}
+
+export function endOfMonth(date: Date): Date {
+  return new Date(date.getFullYear(), date.getMonth() + 1, 0);
+}
+
+export function toKey(date: Date): string {
+  return todayKey(date);
+}
+
+export function isSameDay(a: Date, b: Date): boolean {
+  return a.getFullYear() === b.getFullYear()
+    && a.getMonth() === b.getMonth()
+    && a.getDate() === b.getDate();
+}
+
+export function isSameMonth(a: Date, b: Date): boolean {
+  return a.getFullYear() === b.getFullYear()
+    && a.getMonth() === b.getMonth();
+}
 
 /**
- * Obtém a data atual no formato YYYY-MM-DD
+ * Gera uma matriz 6x7 de datas para exibir no calendário.
+ * Começa no domingo (0) e termina no sábado (6), cobrindo todo o mês visível.
+ * Inclui dias do início/fim que pertencem ao mês anterior/seguinte para completar as 6 semanas.
  */
-export const getCurrentDate = (): string => {
-    const now = new Date();
-    return now.toISOString().split('T')[0];
-  };
+export function getMonthMatrix(viewDate: Date): Date[][] {
+  const start = startOfMonth(viewDate);
+  const end = endOfMonth(viewDate);
 
-/**
- * Obtém a data atual no formato YYYY-MM-DD (alias para getCurrentDate)
- */
-export const todayKey = (): string => {
-    return getCurrentDate();
-  };
+  // Domingo = 0 ... Sábado = 6
+  const startWeekDay = start.getDay();
+  // Primeiro dia visível: domingo anterior/igual ao dia 1 do mês
+  const firstVisible = addDays(start, -startWeekDay);
 
-/**
- * Formata uma data de forma humanizada em português
- * Exemplo: "segunda-feira, 23 de agosto de 2025"
- */
-export const formatHuman = (date: Date): string => {
-    return date.toLocaleDateString('pt-BR', {
-      weekday: 'long',
-      year: 'numeric',
-      month: 'long',
-      day: 'numeric'
-    });
-  };
-  
-  /**
-   * Formata uma data para exibição em português
-   * Exemplo: "segunda-feira, 23 de agosto de 2025"
-   */
-  export const formatDateForDisplay = (date: Date): string => {
-    return date.toLocaleDateString('pt-BR', {
-      weekday: 'long',
-      year: 'numeric',
-      month: 'long',
-      day: 'numeric'
-    });
-  };
-  
-  /**
-   * Formata uma data curta em português
-   * Exemplo: "23/08/2025"
-   */
-  export const formatShortDate = (date: Date): string => {
-    return date.toLocaleDateString('pt-BR');
-  };
-  
-  /**
-   * Verifica se duas datas são do mesmo dia
-   */
-  export const isSameDay = (date1: Date, date2: Date): boolean => {
-    return date1.toDateString() === date2.toDateString();
-  };
-  
-  /**
-   * Verifica se a data é hoje
-   */
-  export const isToday = (date: Date): boolean => {
-    return isSameDay(date, new Date());
-  };
-  
-  /**
-   * Verifica se a data foi ontem
-   */
-  export const isYesterday = (date: Date): boolean => {
-    const yesterday = new Date();
-    yesterday.setDate(yesterday.getDate() - 1);
-    return isSameDay(date, yesterday);
-  };
-  
-  /**
-   * Calcula a diferença em dias entre duas datas
-   */
-  export const daysDifference = (date1: Date, date2: Date): number => {
-    const oneDay = 24 * 60 * 60 * 1000; // horas*minutos*segundos*milissegundos
-    return Math.round(Math.abs((date1.getTime() - date2.getTime()) / oneDay));
-  };
-  
-  /**
-   * Converte string no formato YYYY-MM-DD para Date
-   */
-  export const parseDate = (dateString: string): Date => {
-    return new Date(dateString + 'T00:00:00');
-  };
-  
-  /**
-   * Obtém o início do mês para uma data
-   */
-  export const getMonthStart = (date: Date): Date => {
-    return new Date(date.getFullYear(), date.getMonth(), 1);
-  };
-  
-  /**
-   * Obtém o fim do mês para uma data
-   */
-  export const getMonthEnd = (date: Date): Date => {
-    return new Date(date.getFullYear(), date.getMonth() + 1, 0);
-  };
-  
-  /**
-   * Obtém todos os dias de um mês
-   */
-  export const getDaysInMonth = (date: Date): Date[] => {
-    const start = getMonthStart(date);
-    const end = getMonthEnd(date);
-    const days: Date[] = [];
-    
-    for (let day = new Date(start); day <= end; day.setDate(day.getDate() + 1)) {
-      days.push(new Date(day));
+  const matrix: Date[][] = [];
+  let cursor = new Date(firstVisible);
+
+  for (let week = 0; week < 6; week++) {
+    const row: Date[] = [];
+    for (let day = 0; day < 7; day++) {
+      row.push(new Date(cursor));
+      cursor = addDays(cursor, 1);
     }
-    
-    return days;
-  };
-  
-  /**
-   * Gera um seed único baseado na data e ID do usuário
-   * Usado para garantir que a mesma oração seja mostrada para o mesmo usuário no mesmo dia
-   */
-  export const generateDailySeed = (date: Date, userId: string = 'default'): number => {
-    const dateString = date.toISOString().split('T')[0]; // YYYY-MM-DD
-    const combined = `${dateString}-${userId}`;
-    
-    // Hash simples para gerar um número consistente
-    let hash = 0;
-    for (let i = 0; i < combined.length; i++) {
-      const char = combined.charCodeAt(i);
-      hash = ((hash << 5) - hash) + char;
-      hash = hash & hash; // Converter para 32-bit integer
-    }
-    
-    return Math.abs(hash);
-  };
+    matrix.push(row);
+  }
+
+  return matrix;
+}
+
+/** Retorna o nome do mês no formato "Agosto 2025" (pt-BR). */
+export function monthTitle(date: Date): string {
+  return date.toLocaleDateString('pt-BR', { month: 'long', year: 'numeric' });
+}
+
+/** Avança/retrocede o mês de uma data base, mantendo o dia 1. */
+export function addMonths(base: Date, delta: number): Date {
+  const y = base.getFullYear();
+  const m = base.getMonth();
+  return new Date(y, m + delta, 1);
+}
   

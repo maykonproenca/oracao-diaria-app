@@ -1,8 +1,9 @@
 // components/ErrorState.tsx
-// Componente simples para exibir erros com opção de "Tentar novamente".
+// Estado de erro com botão de tentar novamente (usa tema).
 
+import { ThemedText, useTheme } from '@/components/ui/Themed';
 import React from 'react';
-import { Pressable, Text, View } from 'react-native';
+import { Pressable, View } from 'react-native';
 
 type Props = {
   message: string;
@@ -10,21 +11,33 @@ type Props = {
 };
 
 export default function ErrorState({ message, onRetry }: Props) {
+  const { colors, radius, spacing } = useTheme();
   return (
-    <View style={{ padding: 16, gap: 12 }}>
-      <Text style={{ fontSize: 16, fontWeight: '600' }}>Ops, algo deu errado</Text>
-      <Text style={{ fontSize: 14, opacity: 0.8 }}>{message}</Text>
+    <View
+      style={{
+        backgroundColor: colors.dangerBg,
+        borderColor: colors.border,
+        borderWidth: 1,
+        borderRadius: radius.md,
+        padding: spacing(4),
+        gap: spacing(3),
+      }}
+    >
+      <ThemedText size="h2" weight="800" tone="danger">Ops, algo deu errado</ThemedText>
+      <ThemedText>{message}</ThemedText>
       {onRetry && (
         <Pressable
           onPress={onRetry}
           style={({ pressed }) => ({
-            backgroundColor: pressed ? '#1d4ed8' : '#2563eb',
-            paddingVertical: 10,
-            paddingHorizontal: 14,
-            borderRadius: 8,
+            backgroundColor: pressed ? colors.primaryPressed : colors.primary,
+            paddingVertical: spacing(3),
+            paddingHorizontal: spacing(4),
+            borderRadius: radius.sm,
           })}
         >
-          <Text style={{ color: 'white', textAlign: 'center', fontWeight: '600' }}>Tentar novamente</Text>
+          <ThemedText weight="800" style={{ color: colors.primaryText, textAlign: 'center' }}>
+            Tentar novamente
+          </ThemedText>
         </Pressable>
       )}
     </View>

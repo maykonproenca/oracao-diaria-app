@@ -4,8 +4,8 @@
 // - garante persistência do "qual ID foi escolhido hoje" em daily_prayer_status
 // - expõe funções para marcar como concluída e obter estatísticas
 
-import { getBasicStats, getCurrentStreak, getDayStatus, getPrayerById, getPrayersCount, upsertDayStatus } from '@/utils/database';
 import { todayKey } from '@/utils/date';
+import { getBasicStats, getCurrentStreak, getDayStatus, getPrayerById, getPrayersCount, upsertDayStatus } from '@/utils/db';
 import { hashStringFNV1a } from '@/utils/hash';
 
 export type Prayer = { id: number; title: string; content: string };

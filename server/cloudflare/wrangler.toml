@@ -1,0 +1,7 @@
+name = "oracao-diaria-claude-proxy"
+main = "src/worker.ts"
+compatibility_date = "2025-08-01"
+
+[vars]
+# Modelo padrão da Anthropic (pode trocar depois)
+ANTHROPIC_MODEL = "claude-sonnet-4-20250514"

@@ -4,7 +4,7 @@
 
 import type { TodayPrayerResult } from '@/services/prayerService';
 import { getOrCreateTodayPrayer, getStats, markTodayAsCompleted } from '@/services/prayerService';
-import { insertInitialPrayers } from '@/utils/database';
+import { insertInitialPrayers } from '@/utils/db';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 
 type State = {

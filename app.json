@@ -1,22 +1,32 @@
 {
   "expo": {
-    "name": "oracao-diaria-app",
+    "name": "Oracao Diaria",
     "slug": "oracao-diaria-app",
     "version": "1.0.0",
+    "scheme": "oracaodiaria",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
-    "scheme": "oracaodiariaapp",
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
-    "ios": {
-      "supportsTablet": true
+    "splash": {
+      "image": "./assets/images/splash-icon.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#ffffff"
     },
     "android": {
+      "package": "com.seuprojeto.oracaodiaria",
+      "versionCode": 1,
       "adaptiveIcon": {
         "foregroundImage": "./assets/images/adaptive-icon.png",
         "backgroundColor": "#ffffff"
-      },
-      "edgeToEdgeEnabled": true
+      }
+    },
+    "ios": {
+      "bundleIdentifier": "com.seuprojeto.oracaodiaria",
+      "supportsTablet": false,
+      "infoPlist": {
+        "NSUserTrackingUsageDescription": "Usaremos o identificador para entregar anúncios relevantes."
+      }
     },
     "web": {
       "bundler": "metro",
@@ -34,10 +44,28 @@
           "backgroundColor": "#ffffff"
         }
       ],
-      "expo-sqlite"
+      "expo-sqlite",
+      [
+        "expo-notifications",
+        {
+          "icon": "./assets/images/notification-icon.png",
+          "color": "#ffffff",
+          "sounds": [
+            "./assets/sounds/notification.wav"
+          ]
+        }
+      ]
     ],
     "experiments": {
       "typedRoutes": true
-    }
+    },
+    "extra": {
+      "EXPO_PUBLIC_CLAUDE_PROXY_URL": "https://oracao-diaria-claude-proxy.oracoes-diarias.workers.dev",
+      "router": {},
+      "eas": {
+        "projectId": "b031b6e3-528e-47f6-bad1-91aecf164c83"
+      }
+    },
+    "owner": "maykonproenca"
   }
 }

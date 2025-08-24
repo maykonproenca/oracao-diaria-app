@@ -1,137 +1,93 @@
-import React, { useEffect, useState } from 'react';
-import { Text, View, useColorScheme } from 'react-native';
-import { getBasicStats, getCurrentStreak } from '../../utils/database';
-import { todayKey } from '../../utils/date';
+// app/(tabs)/calendario.tsx
+// Tela de calendário mensal com navegação, usando tokens do tema.
+
+import CalendarMonth from '@/components/CalendarMonth';
+import ErrorState from '@/components/ErrorState';
+import { ThemedText, useTheme } from '@/components/ui/Themed';
+import { loadMonth } from '@/services/progressService';
+import { addMonths, monthTitle } from '@/utils/date';
+import React, { useCallback, useEffect, useState } from 'react';
+import { ActivityIndicator, Pressable, RefreshControl, ScrollView, View } from 'react-native';
 
 export default function CalendarioScreen() {
-  const colorScheme = useColorScheme();
-  const isDark = colorScheme === 'dark';
-  
-  const [streakData, setStreakData] = useState<{
-    currentStreak: number;
-    longestStreak: number;
-    totalCompleted: number;
-  } | null>(null);
-  const [loading, setLoading] = useState<boolean>(true);
+  const { colors, radius, spacing } = useTheme();
 
-  useEffect(() => {
-    loadStreakData();
-  }, []);
+  const [viewDate, setViewDate] = useState<Date>(new Date());
+  const [loading, setLoading] = useState(true);
+  const [refreshing, setRefreshing] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [matrix, setMatrix] = useState<any[][] | null>(null);
 
-  const loadStreakData = async () => {
+  const load = useCallback(async (date: Date) => {
+    setLoading(true);
+    setError(null);
     try {
-      const today = todayKey();
-      const [basic, current] = await Promise.all([getBasicStats(), getCurrentStreak(today)]);
-      
-      setStreakData({
-        currentStreak: current,
-        longestStreak: basic.longestStreak,
-        totalCompleted: basic.totalCompleted,
-      });
-    } catch (error) {
-      console.error('Erro ao carregar dados de streak:', error);
+      const { matrix } = await loadMonth(date);
+      setMatrix(matrix);
+    } catch (e: any) {
+      setError(e?.message ?? 'Erro ao carregar calendário');
     } finally {
       setLoading(false);
     }
-  };
+  }, []);
 
-  if (loading) {
-    return (
-      <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center', backgroundColor: isDark ? '#1a1a1a' : '#f8f9fa' }}>
-        <Text style={{ fontSize: 16, color: isDark ? '#bdc3c7' : '#6c757d' }}>Carregando dados...</Text>
-      </View>
-    );
-  }
+  const onRefresh = useCallback(async () => {
+    setRefreshing(true);
+    try {
+      await load(viewDate);
+    } finally {
+      setRefreshing(false);
+    }
+  }, [load, viewDate]);
+
+  useEffect(() => {
+    load(viewDate);
+  }, [viewDate, load]);
 
   return (
-    <View style={{ flex: 1, backgroundColor: isDark ? '#1a1a1a' : '#f8f9fa', padding: 16 }}>
-      <Text style={{ fontSize: 24, fontWeight: 'bold', color: isDark ? '#3498db' : '#2c3e50', textAlign: 'center', marginBottom: 8 }}>
-        📅 Calendário de Orações
-      </Text>
-      <Text style={{ fontSize: 16, color: isDark ? '#bdc3c7' : '#6c757d', textAlign: 'center', marginBottom: 32 }}>
-        Acompanhe sua jornada espiritual
-      </Text>
-      
-      <View style={{ marginBottom: 32 }}>
-        <View style={{ 
-          backgroundColor: isDark ? '#2d2d2d' : '#ffffff', 
-          borderRadius: 12, 
-          padding: 20, 
-          alignItems: 'center', 
-          marginBottom: 24,
-          shadowColor: '#000000',
-          shadowOffset: { width: 0, height: 2 },
-          shadowOpacity: 0.1,
-          shadowRadius: 4,
-          elevation: 3,
-        }}>
-          <Text style={{ fontSize: 16, color: isDark ? '#bdc3c7' : '#6c757d', marginBottom: 8 }}>Streak Atual</Text>
-          <Text style={{ fontSize: 48, fontWeight: 'bold', color: isDark ? '#2ecc71' : '#28a745', marginBottom: 4 }}>
-            {streakData?.currentStreak || 0}
-          </Text>
-          <Text style={{ fontSize: 14, color: isDark ? '#bdc3c7' : '#6c757d' }}>dias consecutivos</Text>
-        </View>
-
-        <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
-          <View style={{ 
-            flex: 1, 
-            backgroundColor: isDark ? '#2d2d2d' : '#ffffff', 
-            borderRadius: 12, 
-            padding: 16, 
-            alignItems: 'center', 
-            marginRight: 8,
-            shadowColor: '#000000',
-            shadowOffset: { width: 0, height: 1 },
-            shadowOpacity: 0.1,
-            shadowRadius: 2,
-            elevation: 2,
-          }}>
-            <Text style={{ fontSize: 32, fontWeight: 'bold', color: isDark ? '#3498db' : '#2c3e50', marginBottom: 4 }}>
-              {streakData?.longestStreak || 0}
-            </Text>
-            <Text style={{ fontSize: 12, color: isDark ? '#bdc3c7' : '#6c757d', textAlign: 'center' }}>Maior Streak</Text>
-          </View>
-          
-          <View style={{ 
-            flex: 1, 
-            backgroundColor: isDark ? '#2d2d2d' : '#ffffff', 
-            borderRadius: 12, 
-            padding: 16, 
-            alignItems: 'center', 
-            marginLeft: 8,
-            shadowColor: '#000000',
-            shadowOffset: { width: 0, height: 1 },
-            shadowOpacity: 0.1,
-            shadowRadius: 2,
-            elevation: 2,
-          }}>
-            <Text style={{ fontSize: 32, fontWeight: 'bold', color: isDark ? '#3498db' : '#2c3e50', marginBottom: 4 }}>
-              {streakData?.totalCompleted || 0}
-            </Text>
-            <Text style={{ fontSize: 12, color: isDark ? '#bdc3c7' : '#6c757d', textAlign: 'center' }}>Total de Dias</Text>
-          </View>
-        </View>
+    <ScrollView
+      style={{ flex: 1, backgroundColor: colors.background }}
+      contentContainerStyle={{ padding: spacing(4), gap: spacing(4) }}
+      refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} />}
+    >
+      {/* Cabeçalho com navegação */}
+      <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
+        <NavButton dir="left" onPress={() => setViewDate(addMonths(viewDate, -1))} />
+        <ThemedText size="title" weight="800">{monthTitle(viewDate)}</ThemedText>
+        <NavButton dir="right" onPress={() => setViewDate(addMonths(viewDate, 1))} />
       </View>
 
-      <View style={{ 
-        backgroundColor: isDark ? '#3498db20' : '#3498db20', 
-        borderRadius: 12, 
-        padding: 16, 
-        marginBottom: 24, 
-        borderLeftWidth: 4, 
-        borderLeftColor: isDark ? '#5dade2' : '#3498db' 
-      }}>
-        <Text style={{ fontSize: 14, color: isDark ? '#ffffff' : '#2c3e50', textAlign: 'center', fontWeight: '500' }}>
-          {streakData && streakData.totalCompleted > 0 
-            ? `Você já completou ${streakData.totalCompleted} orações!`
-            : 'Nenhuma oração registrada ainda'
-          }
-        </Text>
-      </View>
-      
-      <Text style={{ fontSize: 12, color: isDark ? '#95a5a6' : '#95a5a6', textAlign: 'center', fontStyle: 'italic', marginTop: 24 }}>
-        💡 Calendário visual será implementado nos próximos passos
-      </Text>
-    </View>
+      {/* Conteúdo */}
+      {loading && (
+        <View style={{ alignItems: 'center', gap: spacing(2) }}>
+          <ActivityIndicator />
+          <ThemedText tone="muted">Carregando calendário...</ThemedText>
+        </View>
+      )}
+
+      {!loading && error && (
+        <ErrorState message={error} onRetry={() => load(viewDate)} />
+      )}
+
+      {!loading && !error && matrix && <CalendarMonth matrix={matrix as any} />}
+    </ScrollView>
   );
+
+  function NavButton({ dir, onPress }: { dir: 'left' | 'right'; onPress: () => void }) {
+    return (
+      <Pressable
+        onPress={onPress}
+        style={({ pressed }) => ({
+          paddingVertical: spacing(2.5),
+          paddingHorizontal: spacing(3),
+          borderRadius: radius.sm,
+          backgroundColor: pressed ? '#e5e7eb' : colors.surface,
+          borderWidth: 1,
+          borderColor: colors.border,
+        })}
+      >
+        <ThemedText weight="800">{dir === 'left' ? '←' : '→'}</ThemedText>
+      </Pressable>
+    );
+  }
 }
