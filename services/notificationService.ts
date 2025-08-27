@@ -84,14 +84,19 @@ export async function sendTestNotification() {
 
 // Inicializa sistema no início do app (respeitando user_settings)
 export async function initNotificationsOnAppStart() {
-  const settings = await getUserSettings();
-  if (settings.notification_enabled === 1) {
-    const granted = await requestNotificationPermission();
-    if (granted) {
-      const id = await scheduleDailyReminder(settings.notification_hour, settings.notification_minute);
-      await saveUserSettings({ notif_schedule_id: id ?? null });
+  try {
+    const settings = await getUserSettings();
+    if (settings.notification_enabled === 1) {
+      const granted = await requestNotificationPermission();
+      if (granted) {
+        const id = await scheduleDailyReminder(settings.notification_hour, settings.notification_minute);
+        await saveUserSettings({ notif_schedule_id: id ?? null });
+      }
+      // Se não conceder, mantemos enabled=1, mas nada será disparado até o usuário aceitar.
     }
-    // Se não conceder, mantemos enabled=1, mas nada será disparado até o usuário aceitar.
+  } catch (error) {
+    console.error('Erro ao inicializar notificações:', error);
+    // Não re-throw para não quebrar o app
   }
 }
 

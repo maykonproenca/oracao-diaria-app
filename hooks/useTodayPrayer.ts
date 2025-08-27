@@ -33,7 +33,15 @@ export function useTodayPrayer() {
       const [today, stats] = await Promise.all([getOrCreateTodayPrayer(), getStats()]);
       setState({ loading: false, error: null, data: today, stats, actionLoading: false });
     } catch (e: any) {
-      setState((s) => ({ ...s, loading: false, error: e?.message ?? 'Erro ao carregar a oração do dia' }));
+      console.error('Erro no hook useTodayPrayer:', e);
+      setState((s) => ({ 
+        ...s, 
+        loading: false, 
+        error: 'Erro ao carregar dados. Tente novamente.',
+        data: null,
+        stats: null,
+        actionLoading: false 
+      }));
     }
   }, []);
 

@@ -6,111 +6,151 @@ import * as SQLite from 'expo-sqlite';
 
 let _db: SQLite.SQLiteDatabase | null = null;
 
+// Função para resetar o banco de dados em caso de problemas
+export async function resetDatabase(): Promise<void> {
+  try {
+    if (_db) {
+      await _db.closeAsync();
+      _db = null;
+    }
+    // Força recriação do banco na próxima chamada
+  } catch (error) {
+    console.error('Erro ao resetar banco de dados:', error);
+  }
+}
+
 export async function getDB(): Promise<SQLite.SQLiteDatabase> {
   if (_db) return _db;
-  _db = await SQLite.openDatabaseAsync('oracao-diaria.db');
-
-  // Cria tabelas base
-  await _db.execAsync(`
-    PRAGMA journal_mode = WAL;
-
-    CREATE TABLE IF NOT EXISTS prayers (
-      id INTEGER PRIMARY KEY AUTOINCREMENT,
-      title TEXT NOT NULL,
-      content TEXT NOT NULL
-    );
-
-    CREATE TABLE IF NOT EXISTS daily_prayer_status (
-      date TEXT PRIMARY KEY,      -- 'YYYY-MM-DD'
-      prayer_id INTEGER NOT NULL,
-      completed INTEGER NOT NULL DEFAULT 0,  -- 0 ou 1
-      completed_at TEXT,
-      FOREIGN KEY(prayer_id) REFERENCES prayers(id)
-    );
-
-    -- user_settings: id fixo = 1
-    CREATE TABLE IF NOT EXISTS user_settings (
-      id INTEGER PRIMARY KEY CHECK (id = 1),
-      notification_enabled INTEGER NOT NULL DEFAULT 0,
-      notification_hour INTEGER NOT NULL DEFAULT 8,
-      notification_minute INTEGER NOT NULL DEFAULT 0
-    );
-  `);
-
-  // Migração leve: adiciona coluna notif_schedule_id se não existir
+  
   try {
-    const cols = await _db.getAllAsync<{ name: string }>('PRAGMA table_info(user_settings)');
-    const names = new Set(cols.map(c => c.name));
-    if (!names.has('notif_schedule_id')) {
-      await _db.execAsync(`ALTER TABLE user_settings ADD COLUMN notif_schedule_id TEXT;`);
+    _db = await SQLite.openDatabaseAsync('oracao-diaria.db');
+    
+    if (!_db) {
+      throw new Error('Falha ao abrir banco de dados');
     }
-  } catch {
-    // Ignora: SQLite antigo sem suporte a ALTER em algum cenário raro
-  }
 
-  // Garante linha única com defaults
-  await ensureUserSettingsRow();
-  return _db;
+    // Cria tabelas base
+    await _db.execAsync(`
+      PRAGMA journal_mode = WAL;
+
+      CREATE TABLE IF NOT EXISTS prayers (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        title TEXT NOT NULL,
+        content TEXT NOT NULL
+      );
+
+      CREATE TABLE IF NOT EXISTS daily_prayer_status (
+        date TEXT PRIMARY KEY,      -- 'YYYY-MM-DD'
+        prayer_id INTEGER NOT NULL,
+        completed INTEGER NOT NULL DEFAULT 0,  -- 0 ou 1
+        completed_at TEXT,
+        FOREIGN KEY(prayer_id) REFERENCES prayers(id)
+      );
+
+      -- user_settings: id fixo = 1
+      CREATE TABLE IF NOT EXISTS user_settings (
+        id INTEGER PRIMARY KEY CHECK (id = 1),
+        notification_enabled INTEGER NOT NULL DEFAULT 0,
+        notification_hour INTEGER NOT NULL DEFAULT 8,
+        notification_minute INTEGER NOT NULL DEFAULT 0
+      );
+    `);
+
+    // Migração leve: adiciona coluna notif_schedule_id se não existir
+    try {
+      const cols = await _db.getAllAsync<{ name: string }>('PRAGMA table_info(user_settings)');
+      const names = new Set(cols.map(c => c.name));
+      if (!names.has('notif_schedule_id')) {
+        await _db.execAsync(`ALTER TABLE user_settings ADD COLUMN notif_schedule_id TEXT;`);
+      }
+    } catch (error) {
+      console.warn('Erro na migração do banco:', error);
+      // Ignora: SQLite antigo sem suporte a ALTER em algum cenário raro
+    }
+
+    // Garante linha única com defaults
+    await ensureUserSettingsRow();
+    return _db;
+  } catch (error) {
+    console.error('Erro ao inicializar banco de dados:', error);
+    _db = null; // Reset para tentar novamente
+    throw new Error(`Falha ao inicializar banco de dados: ${error instanceof Error ? error.message : 'Erro desconhecido'}`);
+  }
 }
 
 /* ===================== Oracoes ===================== */
 
 // Insere orações iniciais se o banco estiver vazio
 export async function insertInitialPrayers(): Promise<void> {
-  const db = await getDB();
-  const count = await getPrayersCount();
-  
-  if (count > 0) {
-    console.log(`✅ Já existem ${count} orações no banco`);
-    return;
-  }
-
-  const initialPrayers = [
-    {
-      title: 'Oração da Manhã',
-      content: 'Senhor, agradeço por este novo dia. Que eu possa viver em gratidão e amor, seguindo Teus caminhos. Amém.'
-    },
-    {
-      title: 'Oração da Noite',
-      content: 'Pai, agradeço por este dia que passou. Perdoa meus erros e guarda meu sono. Amém.'
-    },
-    {
-      title: 'Oração de Gratidão',
-      content: 'Obrigado, Senhor, por todas as bênçãos que recebo. Que eu nunca deixe de ser grato. Amém.'
-    },
-    {
-      title: 'Oração de Paz',
-      content: 'Deus de paz, acalma meu coração e minha mente. Que eu encontre serenidade em Ti. Amém.'
-    },
-    {
-      title: 'Oração de Força',
-      content: 'Senhor, dá-me força para enfrentar os desafios deste dia. Que eu confie em Ti sempre. Amém.'
+  try {
+    const db = await getDB();
+    const count = await getPrayersCount();
+    
+    if (count > 0) {
+      console.log(`✅ Já existem ${count} orações no banco`);
+      return;
     }
-  ];
 
-  for (const prayer of initialPrayers) {
-    await db.runAsync(
-      'INSERT INTO prayers (title, content) VALUES (?, ?)',
-      [prayer.title, prayer.content]
-    );
+    const initialPrayers = [
+      {
+        title: 'Oração da Manhã',
+        content: 'Senhor, agradeço por este novo dia. Que eu possa viver em gratidão e amor, seguindo Teus caminhos. Amém.'
+      },
+      {
+        title: 'Oração da Noite',
+        content: 'Pai, agradeço por este dia que passou. Perdoa meus erros e guarda meu sono. Amém.'
+      },
+      {
+        title: 'Oração de Gratidão',
+        content: 'Obrigado, Senhor, por todas as bênçãos que recebo. Que eu nunca deixe de ser grato. Amém.'
+      },
+      {
+        title: 'Oração de Paz',
+        content: 'Deus de paz, acalma meu coração e minha mente. Que eu encontre serenidade em Ti. Amém.'
+      },
+      {
+        title: 'Oração de Força',
+        content: 'Senhor, dá-me força para enfrentar os desafios deste dia. Que eu confie em Ti sempre. Amém.'
+      }
+    ];
+
+    for (const prayer of initialPrayers) {
+      await db.runAsync(
+        'INSERT INTO prayers (title, content) VALUES (?, ?)',
+        [prayer.title, prayer.content]
+      );
+    }
+    
+    console.log('✅ Orações iniciais inseridas com sucesso');
+  } catch (error) {
+    console.error('Erro ao inserir orações iniciais:', error);
+    // Não re-throw para não quebrar o app
   }
-  
-  console.log('✅ Orações iniciais inseridas com sucesso');
 }
 
 export async function getPrayersCount(): Promise<number> {
-  const db = await getDB();
-  const rows = await db.getAllAsync<{ count: number }>('SELECT COUNT(*) as count FROM prayers');
-  return rows?.[0]?.count ?? 0;
+  try {
+    const db = await getDB();
+    const rows = await db.getAllAsync<{ count: number }>('SELECT COUNT(*) as count FROM prayers');
+    return rows?.[0]?.count ?? 0;
+  } catch (error) {
+    console.error('Erro ao contar orações:', error);
+    return 0;
+  }
 }
 
 export async function getPrayerById(id: number): Promise<{ id: number; title: string; content: string } | null> {
-  const db = await getDB();
-  const rows = await db.getAllAsync<{ id: number; title: string; content: string }>(
-    'SELECT id, title, content FROM prayers WHERE id = ?',
-    [id]
-  );
-  return rows?.[0] ?? null;
+  try {
+    const db = await getDB();
+    const rows = await db.getAllAsync<{ id: number; title: string; content: string }>(
+      'SELECT id, title, content FROM prayers WHERE id = ?',
+      [id]
+    );
+    return rows?.[0] ?? null;
+  } catch (error) {
+    console.error('Erro ao buscar oração por ID:', error);
+    return null;
+  }
 }
 
 /* ===================== Status do dia ===================== */
@@ -202,29 +242,45 @@ export type UserSettings = {
 };
 
 async function ensureUserSettingsRow(): Promise<void> {
-  const db = await getDB();
-  const row = await db.getAllAsync<{ id: number }>('SELECT id FROM user_settings WHERE id = 1');
-  if (!row || row.length === 0) {
-    await db.runAsync(
-      `INSERT INTO user_settings(id, notification_enabled, notification_hour, notification_minute, notif_schedule_id)
-       VALUES (1, 0, 8, 0, NULL);`
-    );
+  try {
+    const db = await getDB();
+    const row = await db.getAllAsync<{ id: number }>('SELECT id FROM user_settings WHERE id = 1');
+    if (!row || row.length === 0) {
+      await db.runAsync(
+        `INSERT INTO user_settings(id, notification_enabled, notification_hour, notification_minute, notif_schedule_id)
+         VALUES (1, 0, 8, 0, NULL);`
+      );
+    }
+  } catch (error) {
+    console.error('Erro ao garantir linha de configurações do usuário:', error);
+    // Não re-throw para não quebrar a inicialização do banco
   }
 }
 
 export async function getUserSettings(): Promise<UserSettings> {
-  const db = await getDB();
-  await ensureUserSettingsRow();
-  const rows = await db.getAllAsync<UserSettings & { id: number }>(
-    'SELECT notification_enabled, notification_hour, notification_minute, notif_schedule_id FROM user_settings WHERE id = 1'
-  );
-  const r = rows?.[0];
-  return {
-    notification_enabled: (r?.notification_enabled ?? 0) as 0 | 1,
-    notification_hour: r?.notification_hour ?? 8,
-    notification_minute: r?.notification_minute ?? 0,
-    notif_schedule_id: r?.notif_schedule_id ?? null,
-  };
+  try {
+    const db = await getDB();
+    await ensureUserSettingsRow();
+    const rows = await db.getAllAsync<UserSettings & { id: number }>(
+      'SELECT notification_enabled, notification_hour, notification_minute, notif_schedule_id FROM user_settings WHERE id = 1'
+    );
+    const r = rows?.[0];
+    return {
+      notification_enabled: (r?.notification_enabled ?? 0) as 0 | 1,
+      notification_hour: r?.notification_hour ?? 8,
+      notification_minute: r?.notification_minute ?? 0,
+      notif_schedule_id: r?.notif_schedule_id ?? null,
+    };
+  } catch (error) {
+    console.error('Erro ao obter configurações do usuário:', error);
+    // Retorna configurações padrão em caso de erro
+    return {
+      notification_enabled: 0,
+      notification_hour: 8,
+      notification_minute: 0,
+      notif_schedule_id: null,
+    };
+  }
 }
 
 export async function saveUserSettings(partial: Partial<UserSettings>): Promise<void> {

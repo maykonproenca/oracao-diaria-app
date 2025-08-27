@@ -61,7 +61,7 @@ export default function IndexScreen() {
         refreshControl={<RefreshControl refreshing={false} onRefresh={reload} />}
         style={{ backgroundColor: colors.background }}
       >
-        <ErrorState message={error} onRetry={reload} />
+        <ErrorState message={error} onRetry={reload} showResetOption={true} />
       </ScrollView>
     );
   }
