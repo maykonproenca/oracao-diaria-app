@@ -9,7 +9,15 @@ import { View } from 'react-native';
 
 type Props = { matrix: MonthCell[][] };
 
-const WEEKDAY_LABELS = ['D', 'S', 'T', 'Q', 'Q', 'S', 'S'];
+const WEEKDAY_LABELS = [
+  { label: 'D', key: 'dom' },
+  { label: 'S', key: 'seg' },
+  { label: 'T', key: 'ter' },
+  { label: 'Q', key: 'qua' },
+  { label: 'Q', key: 'qui' },
+  { label: 'S', key: 'sex' },
+  { label: 'S', key: 'sab' }
+];
 
 export default function CalendarMonth({ matrix }: Props) {
   const { colors, spacing, radius, text } = useTheme();
@@ -19,9 +27,9 @@ export default function CalendarMonth({ matrix }: Props) {
     <View style={{ gap: spacing(2) }}>
       {/* Cabeçalho dias da semana */}
       <View style={{ flexDirection: 'row', justifyContent: 'space-between', paddingHorizontal: 4 }}>
-        {WEEKDAY_LABELS.map((label) => (
-          <ThemedText key={label} size="small" tone="muted" style={{ width: 40, textAlign: 'center' }}>
-            {label}
+        {WEEKDAY_LABELS.map((day) => (
+          <ThemedText key={day.key} size="small" tone="muted" style={{ width: 40, textAlign: 'center' }}>
+            {day.label}
           </ThemedText>
         ))}
       </View>
@@ -56,7 +64,7 @@ export default function CalendarMonth({ matrix }: Props) {
                       style={{
                         width: 6, height: 6, borderRadius: 3,
                         backgroundColor: colors.completedDot,
-                        position: 'absolute', bottom: 6,
+                        position: 'absolute', bottom: 2,
                       }}
                     />
                   )}

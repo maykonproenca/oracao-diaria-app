@@ -51,7 +51,7 @@ export default function TabsLayout() {
               options={{ 
                 title: 'Oração Diária',
                 tabBarIcon: ({ color, size }) => (
-                  <Ionicons name="hand-left" size={size} color={color} />
+                  <Ionicons name="heart" size={size} color={color} />
                 ),
               }} 
             />

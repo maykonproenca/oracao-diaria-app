@@ -11,6 +11,14 @@ export default function RootLayout() {
           options={{ headerShown: false }} 
         />
         <Stack.Screen 
+          name="notificacoes" 
+          options={{ 
+            title: 'Notificações',
+            headerShown: true,
+            headerBackTitle: 'Voltar'
+          }} 
+        />
+        <Stack.Screen 
           name="+not-found" 
           options={{ title: 'Página não encontrada' }} 
         />

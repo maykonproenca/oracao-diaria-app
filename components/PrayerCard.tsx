@@ -11,8 +11,6 @@ type Props = {
   completed: boolean;
   loadingAction?: boolean;
   onComplete?: () => void;
-  onShare?: () => void;
-  onShareWhatsApp?: () => void;
 };
 
 export default function PrayerCard({
@@ -21,8 +19,6 @@ export default function PrayerCard({
   completed,
   loadingAction,
   onComplete,
-  onShare,
-  onShareWhatsApp,
 }: Props) {
   const { colors, radius, spacing, shadow, text } = useTheme();
 
@@ -47,15 +43,11 @@ export default function PrayerCard({
           <ThemedText tone="muted">Processando...</ThemedText>
         </View>
       ) : (
-        <View style={{ flexDirection: 'row', gap: spacing(3), flexWrap: 'wrap' }}>
-          <PrimaryButton
-            label={completed ? 'Oração concluída hoje' : 'Marcar como orada'}
-            onPress={completed ? undefined : onComplete}
-            disabled={completed}
-          />
-          {onShare && <SecondaryButton label="Compartilhar" onPress={onShare} />}
-          {onShareWhatsApp && <SecondaryButton label="WhatsApp" onPress={onShareWhatsApp} />}
-        </View>
+        <PrimaryButton
+          label={completed ? 'Oração concluída hoje' : 'Marcar como orada'}
+          onPress={completed ? undefined : onComplete}
+          disabled={completed}
+        />
       )}
     </View>
   );

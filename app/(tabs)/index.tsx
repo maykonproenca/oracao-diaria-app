@@ -1,14 +1,14 @@
 // app/(tabs)/index.tsx
 // Tela principal com feedback via Toasts e estados consistentes.
-import React, { useCallback } from 'react';
-import { ScrollView, View, ActivityIndicator, RefreshControl } from 'react-native';
-import { useTodayPrayer } from '@/hooks/useTodayPrayer';
-import PrayerCard from '@/components/PrayerCard';
+import { EnhancedPrayerCard } from '@/components/EnhancedPrayerCard';
 import ErrorState from '@/components/ErrorState';
-import { formatHuman } from '@/utils/date';
-import { buildShareMessage, shareSystem, shareWhatsApp } from '@/services/shareService';
 import { ThemedText, ThemedView, useTheme } from '@/components/ui/Themed';
 import { useToast } from '@/components/ui/ToastProvider';
+import { useTodayPrayer } from '@/hooks/useTodayPrayer';
+import { buildShareMessage, shareSystem, shareWhatsApp } from '@/services/shareService';
+import { formatHuman } from '@/utils/date';
+import React, { useCallback } from 'react';
+import { ActivityIndicator, RefreshControl, ScrollView, View } from 'react-native';
 export default function IndexScreen() {
   const { loading, error, data, stats, actionLoading, reload, complete } = useTodayPrayer();
   const { colors, spacing, radius } = useTheme();
@@ -76,16 +76,17 @@ export default function IndexScreen() {
       <View style={{ gap: spacing(1) }}>
         <ThemedText size="small" tone="muted">Hoje • {dateText}</ThemedText>
       </View>
-      {/* Card da oração + ações */}
-      <PrayerCard
-        title={data?.prayer?.title ?? 'Oração do Dia'}
+      {/* Card da oração */}
+      <EnhancedPrayerCard
+        title="Oração do Dia"
         content={data?.prayer?.content ?? 'Sem orações no banco ainda. Popule a tabela "prayers".'}
-        completed={Boolean(data?.completed)}
-        loadingAction={actionLoading}
+        isCompleted={Boolean(data?.completed)}
         onComplete={onComplete}
-        onShare={data?.prayer?.content ? onShare : undefined}
-        onShareWhatsApp={data?.prayer?.content ? onShareWA : undefined}
+        onShare={onShare}
+        variant="default"
       />
+      
+
       {/* Estatísticas */}
       <View
         style={{
@@ -112,3 +113,5 @@ export default function IndexScreen() {
     </ScrollView>
   );
 }
+
+

@@ -5,8 +5,6 @@ import { ThemedText, useTheme } from '@/components/ui/Themed';
 import { useToast } from '@/components/ui/ToastProvider';
 import { applyNotificationSettings, requestNotificationPermission, sendTestNotification } from '@/services/notificationService';
 import { getUserSettings } from '@/utils/db';
-import { Ionicons } from '@expo/vector-icons';
-import { router } from 'expo-router';
 import React, { useCallback, useEffect, useState } from 'react';
 import { ActivityIndicator, Pressable, Switch, View } from 'react-native';
 
@@ -105,7 +103,7 @@ export default function NotificacoesScreen() {
 
   if (state.loading) {
     return (
-      <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center', gap: spacing(2) }}>
+      <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center', gap: spacing(2), backgroundColor: colors.background }}>
         <ActivityIndicator />
         <ThemedText tone="muted">Carregando...</ThemedText>
       </View>
@@ -113,33 +111,7 @@ export default function NotificacoesScreen() {
   }
 
   return (
-    <View style={{ flex: 1, backgroundColor: colors.background }}>
-      {/* Header com botão de voltar */}
-      <View style={{
-        flexDirection: 'row',
-        alignItems: 'center',
-        paddingHorizontal: spacing(4),
-        paddingVertical: spacing(3),
-        borderBottomWidth: 1,
-        borderBottomColor: colors.border,
-        backgroundColor: colors.surface,
-      }}>
-        <Pressable
-          onPress={() => router.back()}
-          style={({ pressed }) => ({
-            padding: spacing(2),
-            borderRadius: radius.sm,
-            backgroundColor: pressed ? colors.border : 'transparent',
-          })}
-        >
-          <Ionicons name="arrow-back" size={24} color={colors.text} />
-        </Pressable>
-        <ThemedText size="h2" weight="800" style={{ marginLeft: spacing(3) }}>
-          Notificações
-        </ThemedText>
-      </View>
-
-      <View style={{ flex: 1, padding: spacing(4), gap: spacing(4) }}>
+    <View style={{ flex: 1, backgroundColor: colors.background, padding: spacing(4), gap: spacing(4) }}>
         {state.error && (
           <View style={{
             backgroundColor: colors.dangerBg, borderColor: colors.border, borderWidth: 1,
@@ -150,8 +122,12 @@ export default function NotificacoesScreen() {
         )}
 
         <View style={{
-          backgroundColor: colors.surface, borderColor: colors.border, borderWidth: 1,
-          borderRadius: radius.md, padding: spacing(4), gap: spacing(3)
+          backgroundColor: colors.surface,
+          borderColor: colors.border,
+          borderWidth: 1,
+          borderRadius: radius.md,
+          padding: spacing(4),
+          gap: spacing(3),
         }}>
           <ThemedText size="h2" weight="800">Permissão do sistema</ThemedText>
           <ThemedText tone="muted">
@@ -167,8 +143,12 @@ export default function NotificacoesScreen() {
         </View>
 
         <View style={{
-          backgroundColor: colors.surface, borderColor: colors.border, borderWidth: 1,
-          borderRadius: radius.md, padding: spacing(4), gap: spacing(3)
+          backgroundColor: colors.surface,
+          borderColor: colors.border,
+          borderWidth: 1,
+          borderRadius: radius.md,
+          padding: spacing(4),
+          gap: spacing(3),
         }}>
           <Row>
             <ThemedText size="h2" weight="800">Ativar notificações diárias</ThemedText>
@@ -197,7 +177,6 @@ export default function NotificacoesScreen() {
           </ThemedText>
         </View>
       </View>
-    </View>
   );
 }
 
@@ -217,7 +196,7 @@ function PrimaryButton({ title, onPress }: { title: string; onPress?: () => void
         borderRadius: radius.sm,
       })}
     >
-      <ThemedText weight="800" style={{ color: colors.primaryText }}>{title}</ThemedText>
+      <ThemedText weight="800" style={{ color: colors.primaryText, textAlign: 'center' }}>{title}</ThemedText>
     </Pressable>
   );
 }
@@ -236,13 +215,13 @@ function SecondaryButton({ title, onPress }: { title: string; onPress?: () => vo
         borderColor: colors.border,
       })}
     >
-      <ThemedText weight="800">{title}</ThemedText>
+      <ThemedText weight="800" style={{ textAlign: 'center' }}>{title}</ThemedText>
     </Pressable>
   );
 }
 
 function TimeStepper({ label, value, onInc, onDec }: { label: string; value: number; onInc: () => void; onDec: () => void; }) {
-  const { colors, radius, spacing } = useTheme();
+  const { radius, spacing } = useTheme();
   return (
     <View style={{ flex: 1, gap: spacing(2) }}>
       <ThemedText size="small" tone="muted">{label}</ThemedText>
