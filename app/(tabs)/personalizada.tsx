@@ -1,44 +1,34 @@
 // app/(tabs)/personalizada.tsx
 // Geração de oração personalizada (Claude via proxy), com toasts e tratamento de erros/timeout.
-
 import React, { useCallback, useMemo, useRef, useState } from 'react';
 import { ScrollView, View, TextInput, ActivityIndicator, Pressable } from 'react-native';
 import { generateCustomPrayer } from '@/services/aiService';
 import { buildShareMessage, copyToClipboard, shareSystem, shareWhatsApp } from '@/services/shareService';
 import { ThemedText, useTheme } from '@/components/ui/Themed';
 import { useToast } from '@/components/ui/ToastProvider';
-
 function countWords(s: string): number {
   return s.trim().split(/\s+/).filter(Boolean).length;
 }
-
 export default function PersonalizadaScreen() {
   const { colors, radius, spacing } = useTheme();
   const toast = useToast();
-
   const [input, setInput] = useState('');
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState<string | null>(null);
-
   const words = useMemo(() => countWords(input), [input]);
   const overLimit = words > 20;
-
   const abortRef = useRef<AbortController | null>(null);
-
   const onGenerate = useCallback(async () => {
     setError(null);
     setResult(null);
-
     const trimmed = input.trim();
     const w = countWords(trimmed);
     if (!trimmed) return setError('Descreva seu pedido em até 20 palavras.');
     if (w > 20) return setError(`Você digitou ${w} palavras. O limite é 20.`);
-
     setLoading(true);
     const controller = new AbortController();
     abortRef.current = controller;
-
     try {
       const prayer = await generateCustomPrayer(trimmed, { signal: controller.signal });
       setResult(prayer);
@@ -51,20 +41,17 @@ export default function PersonalizadaScreen() {
       abortRef.current = null;
     }
   }, [input, toast]);
-
   const onCancel = useCallback(() => {
     abortRef.current?.abort();
     abortRef.current = null;
     setLoading(false);
     toast.show({ type: 'info', message: 'Geração cancelada.' });
   }, [toast]);
-
   const onClear = useCallback(() => {
     setInput('');
     setResult(null);
     setError(null);
   }, []);
-
   const onCopy = useCallback(async () => {
     try {
       await copyToClipboard(result ?? '');
@@ -73,7 +60,6 @@ export default function PersonalizadaScreen() {
       toast.show({ type: 'error', message: e?.message ?? 'Não foi possível copiar.' });
     }
   }, [result, toast]);
-
   const onShare = useCallback(async () => {
     try {
       const msg = buildShareMessage({ title: 'Oração personalizada', content: result ?? '', includeLink: true });
@@ -83,7 +69,6 @@ export default function PersonalizadaScreen() {
       toast.show({ type: 'error', message: e?.message ?? 'Falha ao compartilhar.' });
     }
   }, [result, toast]);
-
   const onShareWA = useCallback(async () => {
     try {
       const msg = buildShareMessage({ title: 'Oração personalizada', content: result ?? '', includeLink: true });
@@ -92,15 +77,12 @@ export default function PersonalizadaScreen() {
       toast.show({ type: 'error', message: e?.message ?? 'Falha ao abrir o WhatsApp.' });
     }
   }, [result, toast]);
-
   return (
     <ScrollView
       style={{ flex: 1, backgroundColor: colors.background }}
       contentContainerStyle={{ padding: spacing(4), gap: spacing(4) }}
       keyboardShouldPersistTaps="handled"
     >
-      <ThemedText size="title" weight="800">Oração Personalizada</ThemedText>
-
       <View
         style={{
           backgroundColor: colors.surface,
@@ -114,7 +96,6 @@ export default function PersonalizadaScreen() {
         <ThemedText tone="muted">
           Descreva seu pedido em até <ThemedText weight="800">20 palavras</ThemedText>. Ex.: “agradecimento pela família e sabedoria nas decisões”.
         </ThemedText>
-
         <TextInput
           value={input}
           onChangeText={setInput}
@@ -132,12 +113,10 @@ export default function PersonalizadaScreen() {
             textAlignVertical: 'top',
           }}
         />
-
         <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
           <ThemedText size="small" tone="muted">Palavras: {words}/20</ThemedText>
           {overLimit && <ThemedText size="small" weight="800" tone="danger">Limite excedido</ThemedText>}
         </View>
-
         {error && (
           <View style={{
             backgroundColor: colors.dangerBg,
@@ -147,7 +126,6 @@ export default function PersonalizadaScreen() {
             <ThemedText tone="danger">⚠️ {error}</ThemedText>
           </View>
         )}
-
         {!loading ? (
           <View style={{ flexDirection: 'row', gap: spacing(3), flexWrap: 'wrap' }}>
             <Primary title="Gerar Oração" onPress={onGenerate} disabled={overLimit || !input.trim()} />
@@ -161,7 +139,6 @@ export default function PersonalizadaScreen() {
           </View>
         )}
       </View>
-
       {result && (
         <View
           style={{
@@ -184,7 +161,6 @@ export default function PersonalizadaScreen() {
       )}
     </ScrollView>
   );
-
   function Primary({ title, onPress, disabled }: { title: string; onPress?: () => void; disabled?: boolean }) {
     return (
       <Pressable
@@ -200,7 +176,6 @@ export default function PersonalizadaScreen() {
       </Pressable>
     );
   }
-
   function Secondary({ title, onPress }: { title: string; onPress?: () => void }) {
     return (
       <Pressable

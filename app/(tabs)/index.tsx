@@ -1,6 +1,5 @@
 // app/(tabs)/index.tsx
 // Tela principal com feedback via Toasts e estados consistentes.
-
 import React, { useCallback } from 'react';
 import { ScrollView, View, ActivityIndicator, RefreshControl } from 'react-native';
 import { useTodayPrayer } from '@/hooks/useTodayPrayer';
@@ -10,12 +9,10 @@ import { formatHuman } from '@/utils/date';
 import { buildShareMessage, shareSystem, shareWhatsApp } from '@/services/shareService';
 import { ThemedText, ThemedView, useTheme } from '@/components/ui/Themed';
 import { useToast } from '@/components/ui/ToastProvider';
-
 export default function IndexScreen() {
   const { loading, error, data, stats, actionLoading, reload, complete } = useTodayPrayer();
   const { colors, spacing, radius } = useTheme();
   const toast = useToast();
-
   const onShare = useCallback(async () => {
     try {
       const msg = buildShareMessage({
@@ -29,7 +26,6 @@ export default function IndexScreen() {
       toast.show({ type: 'error', message: e?.message ?? 'Falha ao compartilhar.' });
     }
   }, [data?.prayer?.title, data?.prayer?.content, toast]);
-
   const onShareWA = useCallback(async () => {
     try {
       const msg = buildShareMessage({
@@ -42,7 +38,6 @@ export default function IndexScreen() {
       toast.show({ type: 'error', message: e?.message ?? 'Falha ao abrir o WhatsApp.' });
     }
   }, [data?.prayer?.title, data?.prayer?.content, toast]);
-
   const onComplete = useCallback(async () => {
     try {
       await complete();
@@ -51,7 +46,6 @@ export default function IndexScreen() {
       toast.show({ type: 'error', message: e?.message ?? 'Falha ao concluir.' });
     }
   }, [complete, toast]);
-
   if (loading) {
     return (
       <ThemedView style={{ flex: 1, alignItems: 'center', justifyContent: 'center', gap: spacing(3) }}>
@@ -60,7 +54,6 @@ export default function IndexScreen() {
       </ThemedView>
     );
   }
-
   if (error) {
     return (
       <ScrollView
@@ -72,9 +65,7 @@ export default function IndexScreen() {
       </ScrollView>
     );
   }
-
   const dateText = data?.dateKey ? formatHuman(new Date(data.dateKey + 'T00:00:00')) : '';
-
   return (
     <ScrollView
       style={{ flex: 1, backgroundColor: colors.background }}
@@ -84,9 +75,7 @@ export default function IndexScreen() {
       {/* Cabeçalho */}
       <View style={{ gap: spacing(1) }}>
         <ThemedText size="small" tone="muted">Hoje • {dateText}</ThemedText>
-        <ThemedText size="title" weight="800">Oração Diária</ThemedText>
       </View>
-
       {/* Card da oração + ações */}
       <PrayerCard
         title={data?.prayer?.title ?? 'Oração do Dia'}
@@ -97,7 +86,6 @@ export default function IndexScreen() {
         onShare={data?.prayer?.content ? onShare : undefined}
         onShareWhatsApp={data?.prayer?.content ? onShareWA : undefined}
       />
-
       {/* Estatísticas */}
       <View
         style={{
@@ -114,7 +102,6 @@ export default function IndexScreen() {
         <ThemedText>Maior streak: <ThemedText weight="800">{stats?.longestStreak ?? 0}</ThemedText> dia(s)</ThemedText>
         <ThemedText>Total concluídas: <ThemedText weight="800">{stats?.totalCompleted ?? 0}</ThemedText></ThemedText>
       </View>
-
       {!data?.prayer?.content && (
         <View style={{ padding: spacing(3) }}>
           <ThemedText tone="muted" size="small">

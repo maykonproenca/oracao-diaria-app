@@ -1,12 +1,14 @@
-// app/(tabs)/notificacoes.tsx
-// Configuração de notificações com feedback via Toasts.
+// app/notificacoes.tsx
+// Configuração de notificações com feedback via Toasts e botão de voltar.
 
-import React, { useCallback, useEffect, useState } from 'react';
-import { View, Text, Switch, Pressable, ActivityIndicator } from 'react-native';
-import { getUserSettings } from '@/utils/db';
-import { applyNotificationSettings, requestNotificationPermission, sendTestNotification } from '@/services/notificationService';
-import { useTheme, ThemedText } from '@/components/ui/Themed';
+import { ThemedText, useTheme } from '@/components/ui/Themed';
 import { useToast } from '@/components/ui/ToastProvider';
+import { applyNotificationSettings, requestNotificationPermission, sendTestNotification } from '@/services/notificationService';
+import { getUserSettings } from '@/utils/db';
+import { Ionicons } from '@expo/vector-icons';
+import { router } from 'expo-router';
+import React, { useCallback, useEffect, useState } from 'react';
+import { ActivityIndicator, Pressable, Switch, View } from 'react-native';
 
 type UIState = {
   loading: boolean;
@@ -111,64 +113,89 @@ export default function NotificacoesScreen() {
   }
 
   return (
-    <View style={{ flex: 1, backgroundColor: colors.background, padding: spacing(4), gap: spacing(4) }}>
-      <ThemedText size="title" weight="800">Notificações</ThemedText>
-
-      {state.error && (
-        <View style={{
-          backgroundColor: colors.dangerBg, borderColor: colors.border, borderWidth: 1,
-          borderRadius: radius.md, padding: spacing(3)
-        }}>
-          <ThemedText tone="danger">⚠️ {state.error}</ThemedText>
-        </View>
-      )}
-
+    <View style={{ flex: 1, backgroundColor: colors.background }}>
+      {/* Header com botão de voltar */}
       <View style={{
-        backgroundColor: colors.surface, borderColor: colors.border, borderWidth: 1,
-        borderRadius: radius.md, padding: spacing(4), gap: spacing(3)
+        flexDirection: 'row',
+        alignItems: 'center',
+        paddingHorizontal: spacing(4),
+        paddingVertical: spacing(3),
+        borderBottomWidth: 1,
+        borderBottomColor: colors.border,
+        backgroundColor: colors.surface,
       }}>
-        <ThemedText size="h2" weight="800">Permissão do sistema</ThemedText>
-        <ThemedText tone="muted">
-          Status: {state.permissionKnown ? (state.permissionGranted ? 'Concedida ✅' : 'Negada ❌') : 'Desconhecido'}
-        </ThemedText>
-        <Row>
-          <PrimaryButton title="Solicitar permissão" onPress={askPermission} />
-          <SecondaryButton title="Testar agora" onPress={testNow} />
-        </Row>
-        <ThemedText size="small" tone="muted">
-          Dica: Em Android 13+ a permissão é obrigatória. Se negou antes, vá em Ajustes → Apps → Oração Diária → Notificações.
+        <Pressable
+          onPress={() => router.back()}
+          style={({ pressed }) => ({
+            padding: spacing(2),
+            borderRadius: radius.sm,
+            backgroundColor: pressed ? colors.border : 'transparent',
+          })}
+        >
+          <Ionicons name="arrow-back" size={24} color={colors.text} />
+        </Pressable>
+        <ThemedText size="h2" weight="800" style={{ marginLeft: spacing(3) }}>
+          Notificações
         </ThemedText>
       </View>
 
-      <View style={{
-        backgroundColor: colors.surface, borderColor: colors.border, borderWidth: 1,
-        borderRadius: radius.md, padding: spacing(4), gap: spacing(3)
-      }}>
-        <Row>
-          <ThemedText size="h2" weight="800">Ativar notificações diárias</ThemedText>
-          <Switch value={state.enabled} onValueChange={(v) => setState(s => ({ ...s, enabled: v }))} />
-        </Row>
+      <View style={{ flex: 1, padding: spacing(4), gap: spacing(4) }}>
+        {state.error && (
+          <View style={{
+            backgroundColor: colors.dangerBg, borderColor: colors.border, borderWidth: 1,
+            borderRadius: radius.md, padding: spacing(3)
+          }}>
+            <ThemedText tone="danger">⚠️ {state.error}</ThemedText>
+          </View>
+        )}
 
-        <ThemedText>Horário do lembrete</ThemedText>
-        <Row>
-          <TimeStepper
-            label="Hora"
-            value={state.hour}
-            onInc={() => setState(s => ({ ...s, hour: wrapHour(s.hour + 1) }))}
-            onDec={() => setState(s => ({ ...s, hour: wrapHour(s.hour - 1) }))}
-          />
-          <TimeStepper
-            label="Min"
-            value={state.minute}
-            onInc={() => setState(s => ({ ...s, minute: wrapMinute(s.minute + 5) }))}
-            onDec={() => setState(s => ({ ...s, minute: wrapMinute(s.minute - 5) }))}
-          />
-        </Row>
+        <View style={{
+          backgroundColor: colors.surface, borderColor: colors.border, borderWidth: 1,
+          borderRadius: radius.md, padding: spacing(4), gap: spacing(3)
+        }}>
+          <ThemedText size="h2" weight="800">Permissão do sistema</ThemedText>
+          <ThemedText tone="muted">
+            Status: {state.permissionKnown ? (state.permissionGranted ? 'Concedida ✅' : 'Negada ❌') : 'Desconhecido'}
+          </ThemedText>
+          <Row>
+            <PrimaryButton title="Solicitar permissão" onPress={askPermission} />
+            <SecondaryButton title="Testar agora" onPress={testNow} />
+          </Row>
+          <ThemedText size="small" tone="muted">
+            Dica: Em Android 13+ a permissão é obrigatória. Se negou antes, vá em Ajustes → Apps → Oração Diária → Notificações.
+          </ThemedText>
+        </View>
 
-        <PrimaryButton title={state.saving ? 'Salvando...' : 'Salvar'} onPress={state.saving ? undefined : save} />
-        <ThemedText size="small" tone="muted">
-          Observação: ao salvar, qualquer agendamento antigo é removido e um novo é criado no horário definido.
-        </ThemedText>
+        <View style={{
+          backgroundColor: colors.surface, borderColor: colors.border, borderWidth: 1,
+          borderRadius: radius.md, padding: spacing(4), gap: spacing(3)
+        }}>
+          <Row>
+            <ThemedText size="h2" weight="800">Ativar notificações diárias</ThemedText>
+            <Switch value={state.enabled} onValueChange={(v) => setState(s => ({ ...s, enabled: v }))} />
+          </Row>
+
+          <ThemedText>Horário do lembrete</ThemedText>
+          <Row>
+            <TimeStepper
+              label="Hora"
+              value={state.hour}
+              onInc={() => setState(s => ({ ...s, hour: wrapHour(s.hour + 1) }))}
+              onDec={() => setState(s => ({ ...s, hour: wrapHour(s.hour - 1) }))}
+            />
+            <TimeStepper
+              label="Min"
+              value={state.minute}
+              onInc={() => setState(s => ({ ...s, minute: wrapMinute(s.minute + 5) }))}
+              onDec={() => setState(s => ({ ...s, minute: wrapMinute(s.minute - 5) }))}
+            />
+          </Row>
+
+          <PrimaryButton title={state.saving ? 'Salvando...' : 'Salvar'} onPress={state.saving ? undefined : save} />
+          <ThemedText size="small" tone="muted">
+            Observação: ao salvar, qualquer agendamento antigo é removido e um novo é criado no horário definido.
+          </ThemedText>
+        </View>
       </View>
     </View>
   );
