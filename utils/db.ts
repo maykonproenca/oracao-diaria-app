@@ -93,24 +93,144 @@ export async function insertInitialPrayers(): Promise<void> {
 
     const initialPrayers = [
       {
-        title: '',
-        content: 'Senhor, neste novo dia que se inicia, venho diante de Ti com um coração grato e humilde. Agradeço pela vida que me deste, pela saúde que me sustentas, e por todas as bênçãos que constantemente derramas sobre mim e minha família. Que eu possa viver este dia em total dependência de Ti, buscando em primeiro lugar o Teu reino e a Tua justiça. Guia meus passos, ilumina minhas decisões, e que cada ação minha seja um reflexo do Teu amor e da Tua graça. Que eu seja um instrumento de paz e esperança para aqueles que cruzarem meu caminho hoje. Fortalece minha fé, aumenta minha confiança, e que eu nunca me esqueça de que Tu estás sempre comigo, em todos os momentos. Que este dia seja dedicado a Ti, e que tudo o que eu fizer seja para a Tua glória. Em nome de Jesus, amém.'
+        title: 'Oração 27 - 27/08/2025',
+        content: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum. Sed ut perspiciatis unde omnis iste natus error sit voluptatem accusantium doloremque laudantium.'
       },
       {
-        title: '',
-        content: 'Pai celestial, ao final deste dia, venho agradecer por todas as experiências vividas, pelos aprendizados recebidos, e pela Tua presença constante em minha vida. Perdoa-me pelos erros que cometi, pelas palavras que não deveria ter dito, e pelas oportunidades que deixei passar. Que eu possa descansar em paz, sabendo que Tu cuidas de mim e de todos os meus. Guarda meu sono, protege minha família, e que eu acorde amanhã renovado e pronto para servir-Te novamente. Que eu nunca perca de vista que cada dia é um presente precioso, uma nova chance de crescer em fé e amor. Que eu durma com a certeza de que Tu estás no controle de todas as coisas, e que nada pode me separar do Teu amor. Que minha mente e coração encontrem repouso em Ti, e que eu sonhe com a esperança de um novo dia cheio de possibilidades. Em nome de Jesus, amém.'
+        title: 'Oração 28 - 28/08/2025',
+        content: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum. Sed ut perspiciatis unde omnis iste natus error sit voluptatem accusantium doloremque laudantium.'
       },
       {
-        title: '',
-        content: 'Deus de toda graça e misericórdia, neste momento de reflexão, quero expressar minha gratidão por tudo o que Tu és e por tudo o que tens feito em minha vida. Sou grato pela família que me deste, pelos amigos que me cercam, pelo trabalho que me sustenta, e por cada pequena bênção que muitas vezes passo despercebido. Agradeço pelos desafios que me fazem crescer, pelas dificuldades que me ensinam a confiar mais em Ti, e pelas vitórias que me mostram o Teu poder. Que eu nunca me acostume com a Tua bondade, que eu sempre mantenha um coração grato, e que eu seja um canal de bênçãos para outros. Que minha vida seja um testemunho vivo da Tua graça, e que eu nunca deixe de louvar-Te por tudo. Que eu aprenda a ver as bênçãos em cada situação, mesmo nas mais difíceis, e que eu sempre tenha um espírito de gratidão. Em nome de Jesus, amém.'
+        title: 'Oração 29 - 29/08/2025',
+        content: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum. Sed ut perspiciatis unde omnis iste natus error sit voluptatem accusantium doloremque laudantium.'
       },
       {
-        title: '',
-        content: 'Deus de paz, que transcende todo entendimento, venho diante de Ti buscando a serenidade que só Tu podes dar. Em meio às turbulências da vida, aos ruídos do mundo, e às preocupações que me cercam, que eu encontre em Ti o refúgio seguro para minha alma. Acalma meu coração inquieto, silencia minha mente agitada, e que eu possa experimentar a paz que vem de saber que Tu estás no controle de todas as coisas. Que eu aprenda a confiar mais em Ti, a descansar em Tuas promessas, e a encontrar força na Tua presença. Que eu seja um agente de paz neste mundo conturbado, levando esperança e consolo aos que sofrem. Que eu nunca perca de vista que a verdadeira paz não vem das circunstâncias, mas da certeza de que Tu és meu Pai e que me amas incondicionalmente. Em nome de Jesus, amém.'
+        title: 'Oração 30 - 30/08/2025',
+        content: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum. Sed ut perspiciatis unde omnis iste natus error sit voluptatem accusantium doloremque laudantium.'
       },
       {
-        title: '',
-        content: 'Senhor, fonte de toda força e poder, reconheço que sou fraco e limitado, mas Tu és forte e ilimitado. Neste dia, preciso da Tua força para enfrentar os desafios que se apresentam, para superar as dificuldades que surgem, e para perseverar quando tudo parece difícil. Dá-me coragem para enfrentar meus medos, sabedoria para tomar as decisões certas, e perseverança para não desistir diante dos obstáculos. Que eu confie em Ti completamente, sabendo que Tu és minha rocha e meu refúgio. Que eu encontre força na Tua palavra, poder na Tua presença, e motivação no Teu amor. Que eu seja um exemplo de fé e determinação para outros, mostrando que com Ti posso todas as coisas. Que eu nunca me esqueça de que Tu és minha força e meu escudo, e que em Ti sou mais que vencedor. Em nome de Jesus, amém.'
+        title: 'Oração 31 - 31/08/2025',
+        content: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum. Sed ut perspiciatis unde omnis iste natus error sit voluptatem accusantium doloremque laudantium.'
+      },
+      {
+        title: 'Oração 1 - 01/09/2025',
+        content: 'Oi Pai! Hoje eu quero começar tudo de novo com Você ao meu lado.\n\nObrigado por me dar mais uma chance de recomeçar. Pai, eu ponho este novo dia nas Suas mãos. Me dá energia para enfrentar tudo que vem pela frente. Me ajuda a deixar para trás os erros do passado e a focar no que Você tem de bom para mim. Que eu possa ser uma pessoa melhor hoje. Abençoa meu trabalho, meus relacionamentos, todos os meus planos. Vai comigo em cada lugar que eu for. Eu sei que com Você eu posso tudo.\n\nEu confio neste novo começo. Em nome de Jesus, amém.'
+      },
+      {
+        title: 'Oração 2 - 02/09/2025',
+        content: 'Pai querido, hoje eu preciso tomar algumas decisões importantes e quero Sua ajuda.\n\nDeus, Você sabe que às vezes eu fico confuso e não sei qual caminho escolher. Me dá sabedoria para decidir certo. Me ajuda a ouvir a Sua voz no meio de tantas opções. Não quero escolher só com a emoção ou pela pressão dos outros. Quero fazer o que é melhor para minha vida e para as pessoas que amo. Ilumina minha mente, acalma meu coração. Me dá coragem para seguir o caminho que Você mostrar, mesmo quando parecer difícil.\n\nEu confio na Sua direção. Em nome de Jesus, amém.'
+      },
+      {
+        title: 'Oração 3 - 03/09/2025',
+        content: 'Bom dia, Pai! Estou aqui para renovar minhas forças em Você.\n\nDeus, chegamos no meio da semana e eu preciso de um novo fôlego. Às vezes eu me sinto cansado, mas eu sei que perto de Você eu encontro descanso verdadeiro. Renova minha energia, minha motivação, minha alegria. Me ajuda a não desistir dos meus sonhos. Tira o desânimo do meu coração. Me enche com Sua paz e Sua força. Que eu possa terminar esta semana melhor do que comecei. Obrigado por sempre renovar minha esperança.\n\nVocê é minha força renovadora. Em nome de Jesus, amém.'
+      },
+      {
+        title: 'Oração 4 - 04/09/2025',
+        content: 'Pai, hoje eu quero entregar todas as minhas necessidades nas Suas mãos.\n\nSenhor, Você conhece tudo que eu preciso antes mesmo de eu pedir. Eu entrego para Você as preocupações com dinheiro, com trabalho, com o futuro. Me dá sabedoria para cuidar bem do que eu tenho. Abre portas de oportunidades honestas para mim. Tira a ansiedade do meu coração sobre o que vai acontecer amanhã. Me ensina a viver um dia de cada vez, confiando que Você sempre vai cuidar de mim. Você é meu Pai provedor.\n\nEu descanso na Sua provisão. Em nome de Jesus, amém.'
+      },
+      {
+        title: 'Oração 5 - 05/09/2025',
+        content: 'Pai, chegou a sexta e meu coração está cheio de gratidão!\n\nObrigado por mais uma semana que passou. Pelas vitórias, pelos aprendizados, pelas pessoas que encontrei no caminho. Obrigado por ter estado comigo em cada momento, nos dias bons e nos difíceis. Me perdoa pelos erros que cometi. Obrigado pelo trabalho, pela família, pela saúde, por tudo que tenho. Que eu nunca me esqueça de ser grato. Abençoa meu fim de semana com momentos especiais. Você é tão bom comigo, Pai!\n\nMeu coração transborda de gratidão. Em nome de Jesus, amém.'
+      },
+      {
+        title: 'Oração 6 - 06/09/2025',
+        content: 'Oi Deus! Obrigado por este dia de descanso que Você me dá.\n\nPai, eu sei que o descanso é importante e que até Você descansou. Me ensina a aproveitar bem este tempo sem me sentir culpado. Que eu possa recarregar minhas energias, fazer coisas que me dão prazer, passar tempo com quem eu amo. Me ajuda a desligar das preocupações do trabalho e focar no que realmente importa. Abençoa este sábado com paz, alegria e momentos especiais. Obrigado por cuidar de tudo enquanto eu descanso.\n\nEu descanso seguro em Você. Em nome de Jesus, amém.'
+      },
+      {
+        title: 'Oração 7 - 07/09/2025',
+        content: 'Pai, domingo chegou e eu quero me preparar bem para a semana que vem.\n\nDeus, hoje eu busco Você de uma forma especial. Renova meu coração, minha mente, minha fé. Me prepara para os desafios que vão aparecer. Me dá sabedoria para planejar bem os próximos dias. Que eu possa começar segunda-feira descansado, confiante e cheio de esperança. Abençoa este domingo com momentos de paz, de reflexão, de comunhão com Você. Me ajuda a sempre colocar Você em primeiro lugar na minha vida.\n\nEu confio na nova semana com Você. Em nome de Jesus, amém.'
+      },
+      {
+        title: 'Oração 8 - 08/09/2025',
+        content: 'Bom dia, Pai! Preciso da Sua energia especial para começar esta semana.\n\nDeus, eu confesso que às vezes acordo meio desanimado, mas eu escolho começar este dia com alegria. Me dá disposição para enfrentar tudo que está pela frente. Renova minhas forças físicas, emocionais e espirituais. Me ajuda a ser produtivo, mas sem pressa. Que eu trabalhe com excelência, mas também com paz no coração. Vai comigo em cada compromisso, em cada conversa. Que Sua presença seja real na minha vida hoje.\n\nVocê é minha fonte de energia. Em nome de Jesus, amém.'
+      },
+      {
+        title: 'Oração 9 - 09/09/2025',
+        content: 'Pai, hoje eu quero pedir mais paciência para lidar com as situações da vida.\n\nSenhor, Você sabe como eu sou ansioso e quero que tudo aconteça rápido. Me ensina a ter paciência comigo mesmo, com as pessoas e com as circunstâncias. Me ajuda a não explodir quando as coisas não saem do meu jeito. Me dá calma para esperar no Seu tempo, que é sempre perfeito. Que eu não desista no meio do caminho quando as coisas ficarem difíceis. Renova minha paciência todos os dias.\n\nEu aprendo a esperar em Você. Em nome de Jesus, amém.'
+      },
+      {
+        title: 'Oração 10 - 10/09/2025',
+        content: 'Pai, hoje eu quero orar especialmente pelos meus relacionamentos.\n\nDeus, me ajuda a ser uma pessoa melhor para as pessoas que convivem comigo. Me perdoa quando sou egoísta, impaciente ou orgulhoso. Me ensina a ouvir mais e falar menos. Abençoa meu casamento, minha família, meus amigos, meus colegas de trabalho. Cura as feridas que ainda doem no meu coração. Me ajuda a perdoar quem me machucou. Que eu seja alguém que leva paz, amor e compreensão para todos os relacionamentos.\n\nO Seu amor me ensina a amar. Em nome de Jesus, amém.'
+      },
+      {
+        title: 'Oração 11 - 11/09/2025',
+        content: 'Pai, às vezes eu me sinto perdido. Me ajuda a entender qual é meu propósito aqui.\n\nDeus, eu sei que Você me criou com um plano especial. Me ajuda a descobrir para que eu vim ao mundo. Que talentos Você colocou em mim? Como posso servir melhor? Me dá direção para minha carreira, para meus relacionamentos, para todas as áreas da minha vida. Tira a confusão da minha mente. Me ajuda a não comparar minha vida com a dos outros. Eu quero cumprir meu propósito na terra.\n\nEu confio no Seu plano para mim. Em nome de Jesus, amém.'
+      },
+      {
+        title: 'Oração 12 - 12/09/2025',
+        content: 'Pai, hoje eu preciso da Sua paz. Meu coração anda muito agitado.\n\nSenhor, Você sabe de todas as preocupações que enchem minha mente. Às vezes parece que meus pensamentos não param nunca. Me ajuda a entregar tudo nas Suas mãos. Acalma meu coração ansioso. Tira o medo, a preocupação excessiva, a angústia. Me lembra que Você está cuidando de tudo. Enche meu coração com Sua paz que é diferente de qualquer coisa deste mundo. Que eu possa sentir Você bem pertinho de mim agora.\n\nA Sua paz guarda meu coração. Em nome de Jesus, amém.'
+      },
+      {
+        title: 'Oração 13 - 13/09/2025',
+        content: 'Pai, hoje eu quero agradecer especialmente pela família que Você me deu.\n\nObrigado por cada pessoa que faz parte da minha vida. Pela minha família, pelos amigos que são como irmãos. Cada um é um presente Seu para mim. Abençoa cada um deles hoje. Cuida da saúde, dos sonhos, dos planos de todos. Me ajuda a ser mais paciente, mais carinhoso, mais presente. Que eu saiba demonstrar meu amor e minha gratidão. Perdoa-me quando não dou valor. Que nossos momentos juntos sejam cheios de alegria.\n\nObrigado pela família que tenho. Em nome de Jesus, amém.'
+      },
+      {
+        title: 'Oração 14 - 14/09/2025',
+        content: 'Pai, hoje meu coração só quer te adorar e te louvar.\n\nDeus, Você é tão bom comigo! Obrigado por me amar de um jeito que eu nem consigo entender completamente. Obrigado pela vida, pela saúde, pela família, pelas oportunidades, por tudo. Mesmo quando as coisas ficam difíceis, eu sei que Você está comigo. Eu quero te adorar não só com palavras, mas com toda minha vida. Que as pessoas vejam Você através de mim. Recebe minha gratidão, meu amor, toda minha adoração.\n\nEu te amo muito, Pai! Em nome de Jesus, amém.'
+      },
+      {
+        title: 'Oração 15 - 15/09/2025',
+        content: 'Oi Pai! Mais uma segunda chegou e eu quero começar bem esta semana.\n\nObrigado por me dar a chance de recomeçar sempre. Pai, mesmo quando eu erro, Você me perdoa e me dá novas oportunidades. Hoje eu entrego esta semana toda para Você. Me ajuda a deixar o passado para trás e focar no presente. Renova minha esperança, minha motivação, minha alegria de viver. Que eu possa aprender coisas novas, conhecer pessoas especiais e viver momentos únicos. Vai comigo nesta nova jornada.\n\nEu confio neste recomeço. Em nome de Jesus, amém.'
+      },
+      {
+        title: 'Oração 16 - 16/09/2025',
+        content: 'Pai, mais uma vez eu venho pedir Sua sabedoria para as escolhas que preciso fazer.\n\nDeus, parece que toda semana aparecem decisões novas na minha vida. Algumas pequenas, outras grandes. Me ajuda a escolher sempre o que é certo. Me dá discernimento para ver além das aparências. Que eu não me deixe levar só pela emoção ou pela opinião dos outros. Quero buscar primeiro a Sua vontade. Me dá paz no coração quando eu escolher o caminho certo. Confia em mim Sua sabedoria.\n\nNas Suas mãos eu ponho minhas escolhas. Em nome de Jesus, amém.'
+      },
+      {
+        title: 'Oração 17 - 17/09/2025',
+        content: 'Pai, chegou a metade da semana e eu preciso renovar minhas forças.\n\nDeus, obrigado por ter me sustentado até aqui. Às vezes no meio da semana eu já me sinto cansado, mas eu sei que Você tem força suficiente para mim. Renova meu ânimo, minha disposição, minha alegria. Me ajuda a não desistir dos meus objetivos. Tira o peso das costas, a pressa do coração. Me ensina a trabalhar com tranquilidade, sabendo que Você está cuidando de tudo. Obrigado por ser minha fonte de energia.\n\nEm Você eu encontro descanso. Em nome de Jesus, amém.'
+      },
+      {
+        title: 'Oração 18 - 18/09/2025',
+        content: 'Pai provedor, mais uma vez eu entrego minhas necessidades nas Suas mãos.\n\nSenhor, Você sempre cuidou de mim e sei que vai continuar cuidando. Peço provisão para minha casa, para minha família. Me dá oportunidades de trabalho honesto. Me ensina a administrar bem o que eu tenho. Que eu não seja ganancioso, mas também não seja desleixado. Me ajuda a ser generoso com quem precisa. Tira a ansiedade sobre o futuro. Eu sei que enquanto eu buscar Você primeiro, nada vai me faltar.\n\nVocê é meu Pai que sempre provê. Em nome de Jesus, amém.'
+      },
+      {
+        title: 'Oração 19 - 19/09/2025',
+        content: 'Pai, que semana! Meu coração está transbordando de gratidão.\n\nObrigado por cada dia que passou, por cada experiência que vivi. Pelas pessoas que cruzaram meu caminho, pelas lições que aprendi, pelas vitórias que conquistei. Obrigado até pelas dificuldades, porque através delas eu cresci. Perdoa meus erros e me ajuda a ser uma pessoa melhor. Que eu nunca pare de ser grato pelo que tenho. Abençoa meu fim de semana. Que seja um tempo de alegria e descanso.\n\nMinha alma se alegra em Você. Em nome de Jesus, amém.'
+      },
+      {
+        title: 'Oração 20 - 20/09/2025',
+        content: 'Bom dia, Pai! Sábado chegou e eu quero descansar de verdade.\n\nDeus, obrigado por este dia especial que Você me dá para parar um pouco. Me ensina a descansar sem culpa, a aproveitar este tempo para recarregar as energias. Que eu possa fazer coisas simples que me dão prazer. Passar tempo com quem eu amo, rir, conversar, relaxar. Me ajuda a desligar das preocupações e focar no que realmente importa na vida. Abençoa este dia com momentos de paz e alegria.\n\nNo Seu amor eu encontro descanso. Em nome de Jesus, amém.'
+      },
+      {
+        title: 'Oração 21 - 21/09/2025',
+        content: 'Pai, domingo é dia especial de te buscar e te adorar.\n\nDeus, eu quero começar esta conversa te agradecendo por quem Você é. Você é amor, é paz, é bondade, é fidelidade. Obrigado por nunca me abandonar, mesmo quando eu me afasto. Hoje eu quero renovar meu compromisso com Você. Quero viver de um jeito que te agrade. Me ajuda a ser luz no mundo, sal na terra. Que minha vida seja um louvor constante ao Seu nome. Recebe minha adoração sincera.\n\nTodo louvor seja dado a Você! Em nome de Jesus, amém.'
+      },
+      {
+        title: 'Oração 22 - 22/09/2025',
+        content: 'Oi Deus! Nova segunda, nova semana, novas oportunidades!\n\nPai, eu amo estes momentos de recomeço que Você me dá. Obrigado por apagar o quadro e me deixar pintar uma nova história. Hoje eu escolho começar com alegria, com esperança, com fé. Me ajuda a não carregar os erros do passado como um peso. Que esta semana seja diferente, especial, abençoada. Renova minha motivação para sonhar, para trabalhar, para amar. Eu sei que Você tem surpresas boas preparadas para mim.\n\nEu abraço este novo começo. Em nome de Jesus, amém.'
+      },
+      {
+        title: 'Oração 23 - 23/09/2025',
+        content: 'Pai, parece que as decisões não param de aparecer na minha vida!\n\nSenhor, desde as pequenas escolhas do dia a dia até as grandes decisões que mudam tudo. Me ajuda a decidir sempre com sabedoria. Que eu possa pensar bem antes de escolher, mas que eu também não fique paralisado pela indecisão. Me dá coragem para tomar as decisões difíceis quando for necessário. Me ajuda a aceitar as consequências das minhas escolhas e aprender com elas. Guia cada passo que eu der.\n\nEu confio na Sua direção. Em nome de Jesus, amém.'
+      },
+      {
+        title: 'Oração 24 - 24/09/2025',
+        content: 'Pai, quarta-feira chegou e eu preciso de uma dose extra das Suas forças.\n\nDeus, no meio da semana às vezes bate aquele cansaço, aquele desânimo. Mas eu venho até Você para renovar minhas energias. Me enche com Sua força sobrenatural. Renova minha paixão pelo que eu faço, minha alegria de viver. Me ajuda a ver cada dia como uma nova oportunidade de crescer, de servir, de ser feliz. Tira o peso da rotina. Que cada dia seja uma aventura nova com Você.\n\nVocê renova minhas forças como águia. Em nome de Jesus, amém.'
+      },
+      {
+        title: 'Oração 25 - 25/09/2025',
+        content: 'Pai, hoje eu quero conversar sobre o propósito da minha vida.\n\nDeus, às vezes eu me pergunto se estou no caminho certo, se estou fazendo a diferença. Me ajuda a entender melhor para que Você me criou. Que dons e talentos posso usar para abençoar outras pessoas? Como posso servir melhor na minha família, no meu trabalho, na sociedade? Me dá clareza sobre meus próximos passos. Que eu não viva uma vida vazia, mas cheia de propósito e significado. Usa minha vida para Sua glória.\n\nEu quero viver com propósito. Em nome de Jesus, amém.'
+      },
+      {
+        title: 'Oração 26 - 26/09/2025',
+        content: 'Pai, sexta-feira chegou e meu coração explode de gratidão!\n\nQue semana incrível! Obrigado por cada momento, cada pessoa, cada experiência. Pelas oportunidades que apareceram, pelos problemas que foram resolvidos, pelas alegrias que vivi. Obrigado por estar comigo em todos os momentos. Me perdoa pelas vezes que reclamei ou fui ingrato. Me ajuda a sempre ter um coração grato, que reconhece Suas bênçãos em cada detalhe da vida. Que minha gratidão seja contagiante.\n\nMinha alma bendiz o Seu nome! Em nome de Jesus, amém.'
+      },
+      {
+        title: 'Oração 32 - 27/09/2025',
+        content: 'Oi Pai! Mais um sábado abençoado para descansar em Você.\n\nDeus, obrigado por inventar o descanso! Me ensina a parar, a respirar, a contemplar as coisas boas da vida. Que eu possa aproveitar este dia para fazer coisas simples que me fazem bem. Uma conversa gostosa, um passeio tranquilo, um momento de silêncio. Me ajuda a não me sentir culpado por descansar. Você mesmo descansou, e se é bom para Você, é bom para mim também. Abençoa este sábado especial.\n\nNo Seu descanso eu encontro paz. Em nome de Jesus, amém.'
+      },
+      {
+        title: 'Oração 33 - 28/09/2025',
+        content: 'Pai, domingo chegou e eu quero me preparar bem para uma nova semana.\n\nDeus, hoje eu busco Você com um coração aberto. Prepara meu espírito para os desafios que vão vir. Me dá sabedoria para planejar bem os próximos dias. Renova minha fé, minha esperança, meu amor. Que eu possa começar segunda-feira confiante e animado. Me ajuda a colocar prioridades certas na minha vida. Que Você seja sempre o primeiro em tudo. Abençoa este tempo de preparação e comunhão.\n\nEu me preparo para uma semana vitoriosa. Em nome de Jesus, amém.'
+      },
+      {
+        title: 'Oração 34 - 29/09/2025',
+        content: 'Bom dia, Pai! Preciso daquela energia especial que só Você pode dar.\n\nDeus, eu acordo alguns dias meio sem vontade, mas eu sei que em Você eu encontro motivação verdadeira. Me dá energia não só para o corpo, mas para a alma também. Renova meu entusiasmo pela vida, pelo trabalho, pelos relacionamentos. Me ajuda a começar este dia com um sorriso no rosto e esperança no coração. Que Sua alegria seja minha força. Vai comigo em cada passo que eu der hoje.\n\nVocê é minha fonte de energia! Em nome de Jesus, amém.'
+      },
+      {
+        title: 'Oração 35 - 30/09/2025',
+        content: 'Pai, mais uma terça e eu preciso aprender a ser mais paciente.\n\nSenhor, Você sabe como eu sou ansioso e quero tudo para ontem. Me ensina a ter paciência com o processo da vida. Me ajuda a entender que cada coisa tem seu tempo certo. Que eu tenha paciência comigo mesmo quando eu erro, paciência com as pessoas que são diferentes de mim, paciência com as situações que não posso controlar. Me dá a serenidade para aceitar o que não posso mudar e coragem para mudar o que posso.\n\nEu aprendo a esperar no Seu tempo. Em nome de Jesus, amém.'
       }
     ];
 
