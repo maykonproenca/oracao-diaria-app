@@ -8,6 +8,12 @@
     "icon": "./assets/images/icon.png",
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
+    "fonts": [
+      {
+        "asset": "./assets/fonts/IntroRust.otf",
+        "family": "IntroRust"
+      }
+    ],
     "splash": {
       "image": "./assets/images/splash-icon.png",
       "resizeMode": "contain",

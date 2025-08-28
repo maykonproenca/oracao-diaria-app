@@ -1,11 +1,11 @@
 // app/(tabs)/personalizada.tsx
 // Geração de oração personalizada (Claude via proxy), com toasts e tratamento de erros/timeout.
-import React, { useCallback, useMemo, useRef, useState } from 'react';
-import { ScrollView, View, TextInput, ActivityIndicator, Pressable } from 'react-native';
-import { generateCustomPrayer } from '@/services/aiService';
-import { buildShareMessage, copyToClipboard, shareSystem, shareWhatsApp } from '@/services/shareService';
 import { ThemedText, useTheme } from '@/components/ui/Themed';
 import { useToast } from '@/components/ui/ToastProvider';
+import { generateCustomPrayer } from '@/services/aiService';
+import { buildShareMessage, copyToClipboard, shareSystem, shareWhatsApp } from '@/services/shareService';
+import React, { useCallback, useMemo, useRef, useState } from 'react';
+import { ActivityIndicator, Pressable, ScrollView, TextInput, View } from 'react-native';
 function countWords(s: string): number {
   return s.trim().split(/\s+/).filter(Boolean).length;
 }
@@ -83,6 +83,8 @@ export default function PersonalizadaScreen() {
       contentContainerStyle={{ padding: spacing(4), gap: spacing(4) }}
       keyboardShouldPersistTaps="handled"
     >
+      {/* Título da tela */}
+      <ThemedText size="h1" weight="800">Personalizada</ThemedText>
       <View
         style={{
           backgroundColor: colors.surface,

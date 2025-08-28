@@ -34,8 +34,8 @@ export default function PrayerCard({
         ...shadow(1),
       }}
     >
-      <ThemedText size="title" weight="800">{title ?? 'Oração do Dia'}</ThemedText>
-      <ThemedText style={{ lineHeight: 22 }}>{content ?? 'Carregando oração...'}</ThemedText>
+      {title && <ThemedText size="title" weight="800">{title}</ThemedText>}
+      <ThemedText style={{ lineHeight: 22, fontSize: 17, textAlign: 'justify' }}>{content ?? 'Carregando oração...'}</ThemedText>
 
       {loadingAction ? (
         <View style={{ flexDirection: 'row', gap: spacing(3), alignItems: 'center' }}>

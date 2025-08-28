@@ -19,6 +19,14 @@ export default function RootLayout() {
           }} 
         />
         <Stack.Screen 
+          name="niveis-streak" 
+          options={{ 
+            title: 'Níveis de Streak',
+            headerShown: true,
+            headerBackTitle: 'Voltar'
+          }} 
+        />
+        <Stack.Screen 
           name="+not-found" 
           options={{ title: 'Página não encontrada' }} 
         />

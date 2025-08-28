@@ -93,24 +93,24 @@ export async function insertInitialPrayers(): Promise<void> {
 
     const initialPrayers = [
       {
-        title: 'Oração da Manhã',
-        content: 'Senhor, agradeço por este novo dia. Que eu possa viver em gratidão e amor, seguindo Teus caminhos. Amém.'
+        title: '',
+        content: 'Senhor, neste novo dia que se inicia, venho diante de Ti com um coração grato e humilde. Agradeço pela vida que me deste, pela saúde que me sustentas, e por todas as bênçãos que constantemente derramas sobre mim e minha família. Que eu possa viver este dia em total dependência de Ti, buscando em primeiro lugar o Teu reino e a Tua justiça. Guia meus passos, ilumina minhas decisões, e que cada ação minha seja um reflexo do Teu amor e da Tua graça. Que eu seja um instrumento de paz e esperança para aqueles que cruzarem meu caminho hoje. Fortalece minha fé, aumenta minha confiança, e que eu nunca me esqueça de que Tu estás sempre comigo, em todos os momentos. Que este dia seja dedicado a Ti, e que tudo o que eu fizer seja para a Tua glória. Em nome de Jesus, amém.'
       },
       {
-        title: 'Oração da Noite',
-        content: 'Pai, agradeço por este dia que passou. Perdoa meus erros e guarda meu sono. Amém.'
+        title: '',
+        content: 'Pai celestial, ao final deste dia, venho agradecer por todas as experiências vividas, pelos aprendizados recebidos, e pela Tua presença constante em minha vida. Perdoa-me pelos erros que cometi, pelas palavras que não deveria ter dito, e pelas oportunidades que deixei passar. Que eu possa descansar em paz, sabendo que Tu cuidas de mim e de todos os meus. Guarda meu sono, protege minha família, e que eu acorde amanhã renovado e pronto para servir-Te novamente. Que eu nunca perca de vista que cada dia é um presente precioso, uma nova chance de crescer em fé e amor. Que eu durma com a certeza de que Tu estás no controle de todas as coisas, e que nada pode me separar do Teu amor. Que minha mente e coração encontrem repouso em Ti, e que eu sonhe com a esperança de um novo dia cheio de possibilidades. Em nome de Jesus, amém.'
       },
       {
-        title: 'Oração de Gratidão',
-        content: 'Obrigado, Senhor, por todas as bênçãos que recebo. Que eu nunca deixe de ser grato. Amém.'
+        title: '',
+        content: 'Deus de toda graça e misericórdia, neste momento de reflexão, quero expressar minha gratidão por tudo o que Tu és e por tudo o que tens feito em minha vida. Sou grato pela família que me deste, pelos amigos que me cercam, pelo trabalho que me sustenta, e por cada pequena bênção que muitas vezes passo despercebido. Agradeço pelos desafios que me fazem crescer, pelas dificuldades que me ensinam a confiar mais em Ti, e pelas vitórias que me mostram o Teu poder. Que eu nunca me acostume com a Tua bondade, que eu sempre mantenha um coração grato, e que eu seja um canal de bênçãos para outros. Que minha vida seja um testemunho vivo da Tua graça, e que eu nunca deixe de louvar-Te por tudo. Que eu aprenda a ver as bênçãos em cada situação, mesmo nas mais difíceis, e que eu sempre tenha um espírito de gratidão. Em nome de Jesus, amém.'
       },
       {
-        title: 'Oração de Paz',
-        content: 'Deus de paz, acalma meu coração e minha mente. Que eu encontre serenidade em Ti. Amém.'
+        title: '',
+        content: 'Deus de paz, que transcende todo entendimento, venho diante de Ti buscando a serenidade que só Tu podes dar. Em meio às turbulências da vida, aos ruídos do mundo, e às preocupações que me cercam, que eu encontre em Ti o refúgio seguro para minha alma. Acalma meu coração inquieto, silencia minha mente agitada, e que eu possa experimentar a paz que vem de saber que Tu estás no controle de todas as coisas. Que eu aprenda a confiar mais em Ti, a descansar em Tuas promessas, e a encontrar força na Tua presença. Que eu seja um agente de paz neste mundo conturbado, levando esperança e consolo aos que sofrem. Que eu nunca perca de vista que a verdadeira paz não vem das circunstâncias, mas da certeza de que Tu és meu Pai e que me amas incondicionalmente. Em nome de Jesus, amém.'
       },
       {
-        title: 'Oração de Força',
-        content: 'Senhor, dá-me força para enfrentar os desafios deste dia. Que eu confie em Ti sempre. Amém.'
+        title: '',
+        content: 'Senhor, fonte de toda força e poder, reconheço que sou fraco e limitado, mas Tu és forte e ilimitado. Neste dia, preciso da Tua força para enfrentar os desafios que se apresentam, para superar as dificuldades que surgem, e para perseverar quando tudo parece difícil. Dá-me coragem para enfrentar meus medos, sabedoria para tomar as decisões certas, e perseverança para não desistir diante dos obstáculos. Que eu confie em Ti completamente, sabendo que Tu és minha rocha e meu refúgio. Que eu encontre força na Tua palavra, poder na Tua presença, e motivação no Teu amor. Que eu seja um exemplo de fé e determinação para outros, mostrando que com Ti posso todas as coisas. Que eu nunca me esqueça de que Tu és minha força e meu escudo, e que em Ti sou mais que vencedor. Em nome de Jesus, amém.'
       }
     ];
 

@@ -3,7 +3,9 @@
 
 import CalendarMonth from '@/components/CalendarMonth';
 import ErrorState from '@/components/ErrorState';
+import StreakProgressBar from '@/components/StreakProgressBar';
 import { ThemedText, useTheme } from '@/components/ui/Themed';
+import { useTodayPrayer } from '@/hooks/useTodayPrayer';
 import { loadMonth } from '@/services/progressService';
 import { addMonths, monthTitle } from '@/utils/date';
 import React, { useCallback, useEffect, useState } from 'react';
@@ -11,6 +13,7 @@ import { ActivityIndicator, Pressable, RefreshControl, ScrollView, View } from '
 
 export default function CalendarioScreen() {
   const { colors, radius, spacing } = useTheme();
+  const { stats } = useTodayPrayer();
 
   const [viewDate, setViewDate] = useState<Date>(new Date());
   const [loading, setLoading] = useState(true);
@@ -50,6 +53,8 @@ export default function CalendarioScreen() {
       contentContainerStyle={{ padding: spacing(4), gap: spacing(4) }}
       refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} />}
     >
+      {/* Título da tela */}
+      <ThemedText size="h1" weight="800">Calendário</ThemedText>
       {/* Cabeçalho com navegação */}
       <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
         <NavButton dir="left" onPress={() => setViewDate(addMonths(viewDate, -1))} />
@@ -70,6 +75,16 @@ export default function CalendarioScreen() {
       )}
 
       {!loading && !error && matrix && <CalendarMonth matrix={matrix as any} />}
+      
+      {/* Espaçamento adicional */}
+      <View style={{ height: spacing(2) }} />
+      
+      {/* Barra de Progresso de Streaks */}
+      <StreakProgressBar
+        currentStreak={stats?.currentStreak ?? 0}
+        longestStreak={stats?.longestStreak ?? 0}
+        totalCompleted={stats?.totalCompleted ?? 0}
+      />
     </ScrollView>
   );
 

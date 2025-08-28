@@ -6,9 +6,10 @@ import { ThemeProvider, useTheme } from '@/components/ui/Themed';
 import { ToastProvider } from '@/components/ui/ToastProvider';
 import { initNotificationsOnAppStart } from '@/services/notificationService';
 import { Ionicons } from '@expo/vector-icons';
+import { useFonts } from 'expo-font';
 import { Tabs, router } from 'expo-router';
 import React, { useEffect, useState } from 'react';
-import { Pressable } from 'react-native';
+import { ActivityIndicator, Image, Pressable, View } from 'react-native';
 
 function NotificationButton() {
   const { colors, spacing, radius } = useTheme();
@@ -28,12 +29,36 @@ function NotificationButton() {
   );
 }
 
+function HeaderLogo() {
+  return (
+    <Image
+      source={require('../../assets/images/ora-logo.png')}
+      style={{
+        width: 110,
+        height: 250,
+        resizeMode: 'contain'
+      }}
+    />
+  );
+}
+
 export default function TabsLayout() {
   const [key, setKey] = useState(0);
+  const [fontsLoaded] = useFonts({
+    'IntroRust': require('../../assets/fonts/IntroRust.otf'),
+  });
 
   useEffect(() => {
     initNotificationsOnAppStart().catch(() => {});
   }, []);
+
+  if (!fontsLoaded) {
+    return (
+      <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+        <ActivityIndicator size="large" />
+      </View>
+    );
+  }
 
   return (
     <ThemeProvider>
@@ -50,6 +75,7 @@ export default function TabsLayout() {
               name="index" 
               options={{ 
                 title: 'Oração Diária',
+                headerTitle: () => <HeaderLogo />,
                 tabBarIcon: ({ color, size }) => (
                   <Ionicons name="heart" size={size} color={color} />
                 ),
@@ -59,6 +85,7 @@ export default function TabsLayout() {
               name="personalizada" 
               options={{ 
                 title: 'Personalizada',
+                headerTitle: () => <HeaderLogo />,
                 tabBarIcon: ({ color, size }) => (
                   <Ionicons name="book" size={size} color={color} />
                 ),
@@ -68,6 +95,7 @@ export default function TabsLayout() {
               name="calendario" 
               options={{ 
                 title: 'Calendário',
+                headerTitle: () => <HeaderLogo />,
                 tabBarIcon: ({ color, size }) => (
                   <Ionicons name="calendar" size={size} color={color} />
                 ),
