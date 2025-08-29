@@ -5,6 +5,7 @@ import PrayerCard from '@/components/PrayerCard';
 import { ThemedText, ThemedView, useTheme } from '@/components/ui/Themed';
 import { useToast } from '@/components/ui/ToastProvider';
 import { useTodayPrayer } from '@/hooks/useTodayPrayer';
+import { buildShareMessage, shareWhatsApp } from '@/services/shareService';
 import { formatHuman } from '@/utils/date';
 import React, { useCallback } from 'react';
 import { ActivityIndicator, RefreshControl, ScrollView, View } from 'react-native';
@@ -20,6 +21,19 @@ export default function IndexScreen() {
       toast.show({ type: 'error', message: e?.message ?? 'Falha ao concluir.' });
     }
   }, [complete, toast]);
+
+  const onShareWhatsApp = useCallback(async () => {
+    try {
+      const msg = buildShareMessage({ 
+        title: 'Oração do Dia', 
+        content: data?.prayer?.content ?? '', 
+        includeLink: true 
+      });
+      await shareWhatsApp(msg);
+    } catch (e: any) {
+      toast.show({ type: 'error', message: e?.message ?? 'Falha ao abrir o WhatsApp.' });
+    }
+  }, [data?.prayer?.content, toast]);
   if (loading) {
     return (
       <ThemedView style={{ flex: 1, alignItems: 'center', justifyContent: 'center', gap: spacing(3) }}>
@@ -54,6 +68,7 @@ export default function IndexScreen() {
         completed={Boolean(data?.completed)}
         loadingAction={actionLoading}
         onComplete={onComplete}
+        onShareWhatsApp={onShareWhatsApp}
       />
       
       {!data?.prayer?.content && (

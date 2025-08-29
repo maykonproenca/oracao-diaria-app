@@ -7,6 +7,7 @@ export interface Prayer {
     content: string;
     category?: string;
     dateCreated: string;
+    release_date: string;
   }
   
   // Tipo para dados de streak do usuário

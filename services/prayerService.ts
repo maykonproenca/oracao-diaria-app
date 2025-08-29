@@ -5,10 +5,9 @@
 // - expõe funções para marcar como concluída e obter estatísticas
 
 import { todayKey } from '@/utils/date';
-import { getBasicStats, getCurrentStreak, getDayStatus, getPrayerById, getPrayersCount, upsertDayStatus } from '@/utils/db';
-import { hashStringFNV1a } from '@/utils/hash';
+import { getBasicStats, getCurrentStreak, getDayStatus, getDB, getPrayerById, getPrayerByReleaseDate, getPrayersCount, upsertDayStatus } from '@/utils/db';
 
-export type Prayer = { id: number; title: string; content: string };
+export type Prayer = { id: number; title: string; content: string; release_date: string };
 
 export type TodayPrayerResult = {
   dateKey: string;
@@ -18,6 +17,7 @@ export type TodayPrayerResult = {
 
 export async function getOrCreateTodayPrayer(): Promise<TodayPrayerResult> {
   const dateKey = todayKey();
+  
   // 1) Se já temos status para hoje, usamos aquele prayer_id
   const status = await getDayStatus(dateKey);
   if (status) {
@@ -25,26 +25,40 @@ export async function getOrCreateTodayPrayer(): Promise<TodayPrayerResult> {
     return { dateKey, prayer, completed: status.completed === 1 };
   }
 
-  // 2) Caso contrário, escolhemos determinísticamente via hash da data
+  // 2) Busca a oração que tem release_date igual à data de hoje
+  const todayPrayer = await getPrayerByReleaseDate(dateKey);
+  
+  if (todayPrayer) {
+    // Encontrou uma oração para hoje, salva o status
+    await upsertDayStatus(dateKey, todayPrayer.id, 0);
+    return { dateKey, prayer: todayPrayer, completed: false };
+  }
+
+  // 3) Se não encontrou oração para hoje, busca a oração mais recente disponível
+  // (fallback para quando não há oração específica para a data atual)
   const total = await getPrayersCount();
   if (total === 0) {
     // Banco ainda não populado
     return { dateKey, prayer: null, completed: false };
   }
 
-  const idx = (hashStringFNV1a(dateKey) % total) + 1; // IDs autoincrement partem de 1
-  const chosen = await getPrayerById(idx);
-  if (!chosen) {
-    // fallback raro: se o id calculado não existir (buraco na tabela),
-    // caímos para o primeiro registro existente.
-    const fallbackId = 1;
-    const fb = await getPrayerById(fallbackId);
-    await upsertDayStatus(dateKey, fb ? fb.id : fallbackId, 0);
-    return { dateKey, prayer: fb ?? null, completed: false };
+  // Busca a oração com release_date mais recente que não seja futura
+  const db = await getDB();
+  const fallbackRows = await db.getAllAsync<{ id: number; title: string; content: string; release_date: string }>(
+    'SELECT id, title, content, release_date FROM prayers WHERE release_date <= ? ORDER BY release_date DESC LIMIT 1',
+    [dateKey]
+  );
+  
+  const fallbackPrayer = fallbackRows?.[0] ?? null;
+  if (fallbackPrayer) {
+    await upsertDayStatus(dateKey, fallbackPrayer.id, 0);
+    return { dateKey, prayer: fallbackPrayer, completed: false };
   }
 
-  await upsertDayStatus(dateKey, chosen.id, 0);
-  return { dateKey, prayer: chosen, completed: false };
+  // 4) Último fallback: primeira oração do banco
+  const firstPrayer = await getPrayerById(1);
+  await upsertDayStatus(dateKey, firstPrayer ? firstPrayer.id : 1, 0);
+  return { dateKey, prayer: firstPrayer, completed: false };
 }
 
 export async function markTodayAsCompleted(): Promise<void> {
