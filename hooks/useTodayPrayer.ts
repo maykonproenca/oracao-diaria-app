@@ -4,6 +4,7 @@
 
 import type { TodayPrayerResult } from '@/services/prayerService';
 import { getOrCreateTodayPrayer, getStats, markTodayAsCompleted } from '@/services/prayerService';
+import { checkAndUpdatePrayers } from '@/services/prayerUpdateService';
 import { insertInitialPrayers } from '@/utils/db';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 
@@ -27,9 +28,13 @@ export function useTodayPrayer() {
   const load = useCallback(async () => {
     setState((s) => ({ ...s, loading: true, error: null }));
     try {
-      // Inserir orações iniciais se necessário
+      // 1. Verificar e atualizar orações se necessário
+      await checkAndUpdatePrayers();
+      
+      // 2. Inserir orações iniciais se necessário (fallback)
       await insertInitialPrayers();
       
+      // 3. Carregar dados do usuário
       const [today, stats] = await Promise.all([getOrCreateTodayPrayer(), getStats()]);
       setState({ loading: false, error: null, data: today, stats, actionLoading: false });
     } catch (e: any) {

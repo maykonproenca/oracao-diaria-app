@@ -33,13 +33,24 @@ export async function getDB(): Promise<SQLite.SQLiteDatabase> {
     await _db.execAsync(`
       PRAGMA journal_mode = WAL;
 
+      -- Tabela de controle de versão das orações
+      CREATE TABLE IF NOT EXISTS prayers_version (
+        id INTEGER PRIMARY KEY CHECK (id = 1),
+        version INTEGER NOT NULL DEFAULT 1,
+        last_updated TEXT NOT NULL,
+        prayers_count INTEGER NOT NULL DEFAULT 0
+      );
+
+      -- Tabela de orações (conteúdo do app)
       CREATE TABLE IF NOT EXISTS prayers (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         title TEXT NOT NULL,
         content TEXT NOT NULL,
-        release_date TEXT NOT NULL
+        release_date TEXT NOT NULL,
+        checksum TEXT NOT NULL DEFAULT '' -- Para detectar mudanças
       );
 
+      -- Tabela de status do usuário (dados pessoais)
       CREATE TABLE IF NOT EXISTS daily_prayer_status (
         date TEXT PRIMARY KEY,      -- 'YYYY-MM-DD'
         prayer_id INTEGER NOT NULL,
@@ -48,14 +59,16 @@ export async function getDB(): Promise<SQLite.SQLiteDatabase> {
         FOREIGN KEY(prayer_id) REFERENCES prayers(id)
       );
 
-      -- user_settings: id fixo = 1
+      -- Configurações do usuário (dados pessoais)
       CREATE TABLE IF NOT EXISTS user_settings (
         id INTEGER PRIMARY KEY CHECK (id = 1),
         notification_enabled INTEGER NOT NULL DEFAULT 0,
         notification_hour INTEGER NOT NULL DEFAULT 8,
-        notification_minute INTEGER NOT NULL DEFAULT 0
+        notification_minute INTEGER NOT NULL DEFAULT 0,
+        notif_schedule_id TEXT
       );
 
+      -- Histórico de orações personalizadas (dados pessoais)
       CREATE TABLE IF NOT EXISTS custom_prayers_history (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         request TEXT NOT NULL,
@@ -64,7 +77,7 @@ export async function getDB(): Promise<SQLite.SQLiteDatabase> {
       );
     `);
 
-    // Migração leve: adiciona coluna notif_schedule_id se não existir
+    // Migração: adiciona coluna notif_schedule_id se não existir
     try {
       const cols = await _db.getAllAsync<{ name: string }>('PRAGMA table_info(user_settings)');
       const names = new Set(cols.map(c => c.name));
@@ -73,7 +86,6 @@ export async function getDB(): Promise<SQLite.SQLiteDatabase> {
       }
     } catch (error) {
       console.warn('Erro na migração do banco:', error);
-      // Ignora: SQLite antigo sem suporte a ALTER em algum cenário raro
     }
 
     // Migração: adiciona coluna release_date se não existir
@@ -85,11 +97,22 @@ export async function getDB(): Promise<SQLite.SQLiteDatabase> {
       }
     } catch (error) {
       console.warn('Erro na migração do banco (release_date):', error);
-      // Ignora: SQLite antigo sem suporte a ALTER em algum cenário raro
+    }
+
+    // Migração: adiciona coluna checksum se não existir
+    try {
+      const cols = await _db.getAllAsync<{ name: string }>('PRAGMA table_info(prayers)');
+      const names = new Set(cols.map(c => c.name));
+      if (!names.has('checksum')) {
+        await _db.execAsync(`ALTER TABLE prayers ADD COLUMN checksum TEXT NOT NULL DEFAULT '';`);
+      }
+    } catch (error) {
+      console.warn('Erro na migração do banco (checksum):', error);
     }
 
     // Garante linha única com defaults
     await ensureUserSettingsRow();
+    await ensurePrayersVersionRow();
     return _db;
   } catch (error) {
     console.error('Erro ao inicializar banco de dados:', error);
@@ -100,14 +123,14 @@ export async function getDB(): Promise<SQLite.SQLiteDatabase> {
 
 /* ===================== Oracoes ===================== */
 
-// Insere orações iniciais se o banco estiver vazio
+// Insere orações iniciais se o banco estiver vazio (fallback)
 export async function insertInitialPrayers(): Promise<void> {
   try {
     const db = await getDB();
     const count = await getPrayersCount();
     
     if (count > 0) {
-      console.log(`✅ Já existem ${count} orações no banco`);
+      console.log(`✅ Já existem ${count} orações no banco (pulando inserção inicial)`);
       return;
     }
 
@@ -328,20 +351,6 @@ export async function getPrayerById(id: number): Promise<{ id: number; title: st
   }
 }
 
-export async function getPrayerByReleaseDate(releaseDate: string): Promise<{ id: number; title: string; content: string; release_date: string } | null> {
-  try {
-    const db = await getDB();
-    const rows = await db.getAllAsync<{ id: number; title: string; content: string; release_date: string }>(
-      'SELECT id, title, content, release_date FROM prayers WHERE release_date = ?',
-      [releaseDate]
-    );
-    return rows?.[0] ?? null;
-  } catch (error) {
-    console.error('Erro ao buscar oração por data de divulgação:', error);
-    return null;
-  }
-}
-
 /* ===================== Histórico de Orações Personalizadas ===================== */
 
 export async function saveCustomPrayerToHistory(request: string, generatedPrayer: string): Promise<void> {
@@ -485,6 +494,23 @@ async function ensureUserSettingsRow(): Promise<void> {
   }
 }
 
+async function ensurePrayersVersionRow(): Promise<void> {
+  try {
+    const db = await getDB();
+    const row = await db.getAllAsync<{ id: number }>('SELECT id FROM prayers_version WHERE id = 1');
+    if (!row || row.length === 0) {
+      await db.runAsync(
+        `INSERT INTO prayers_version(id, version, last_updated, prayers_count)
+         VALUES (1, 1, ?, 0);`,
+        [new Date().toISOString()]
+      );
+    }
+  } catch (error) {
+    console.error('Erro ao garantir linha de versão das orações:', error);
+    // Não re-throw para não quebrar a inicialização do banco
+  }
+}
+
 export async function getUserSettings(): Promise<UserSettings> {
   try {
     const db = await getDB();
@@ -529,6 +555,127 @@ export async function saveUserSettings(partial: Partial<UserSettings>): Promise<
       next.notif_schedule_id,
     ]
   );
+}
+
+/* ===================== Controle de Versão das Orações ===================== */
+
+export type PrayersVersion = {
+  version: number;
+  last_updated: string;
+  prayers_count: number;
+};
+
+export async function getPrayersVersion(): Promise<PrayersVersion> {
+  try {
+    const db = await getDB();
+    const rows = await db.getAllAsync<{ version: number; last_updated: string; prayers_count: number }>(
+      'SELECT version, last_updated, prayers_count FROM prayers_version WHERE id = 1'
+    );
+    return rows?.[0] ?? { version: 1, last_updated: new Date().toISOString(), prayers_count: 0 };
+  } catch (error) {
+    console.error('Erro ao buscar versão das orações:', error);
+    return { version: 1, last_updated: new Date().toISOString(), prayers_count: 0 };
+  }
+}
+
+export async function updatePrayersVersion(version: number, prayersCount: number): Promise<void> {
+  try {
+    const db = await getDB();
+    await db.runAsync(
+      `UPDATE prayers_version 
+       SET version = ?, last_updated = ?, prayers_count = ?
+       WHERE id = 1;`,
+      [version, new Date().toISOString(), prayersCount]
+    );
+  } catch (error) {
+    console.error('Erro ao atualizar versão das orações:', error);
+    throw error;
+  }
+}
+
+// Função para gerar checksum de uma oração
+export function generatePrayerChecksum(prayer: { title: string; content: string; release_date: string }): string {
+  const data = `${prayer.title}|${prayer.content}|${prayer.release_date}`;
+  // Hash simples baseado no conteúdo
+  let hash = 0;
+  for (let i = 0; i < data.length; i++) {
+    const char = data.charCodeAt(i);
+    hash = ((hash << 5) - hash) + char;
+    hash = hash & hash; // Converte para 32-bit integer
+  }
+  return Math.abs(hash).toString(36);
+}
+
+// Função para verificar se uma oração precisa ser atualizada
+export async function needsPrayerUpdate(prayer: { title: string; content: string; release_date: string }, prayerId: number): Promise<boolean> {
+  try {
+    const db = await getDB();
+    const rows = await db.getAllAsync<{ checksum: string }>(
+      'SELECT checksum FROM prayers WHERE id = ?',
+      [prayerId]
+    );
+    
+    if (!rows?.[0]) return true; // Oração não existe, precisa inserir
+    
+    const currentChecksum = rows[0].checksum;
+    const newChecksum = generatePrayerChecksum(prayer);
+    
+    return currentChecksum !== newChecksum;
+  } catch (error) {
+    console.error('Erro ao verificar se oração precisa atualização:', error);
+    return true; // Em caso de erro, assume que precisa atualizar
+  }
+}
+
+// Função para atualizar oração específica
+export async function updatePrayer(prayerId: number, prayer: { title: string; content: string; release_date: string }): Promise<void> {
+  try {
+    const db = await getDB();
+    const checksum = generatePrayerChecksum(prayer);
+    
+    await db.runAsync(
+      `UPDATE prayers 
+       SET title = ?, content = ?, release_date = ?, checksum = ?
+       WHERE id = ?;`,
+      [prayer.title, prayer.content, prayer.release_date, checksum, prayerId]
+    );
+  } catch (error) {
+    console.error('Erro ao atualizar oração:', error);
+    throw error;
+  }
+}
+
+// Função para inserir nova oração
+export async function insertPrayer(prayer: { title: string; content: string; release_date: string }): Promise<number> {
+  try {
+    const db = await getDB();
+    const checksum = generatePrayerChecksum(prayer);
+    
+    const result = await db.runAsync(
+      'INSERT INTO prayers (title, content, release_date, checksum) VALUES (?, ?, ?, ?);',
+      [prayer.title, prayer.content, prayer.release_date, checksum]
+    );
+    
+    return result.lastInsertRowId;
+  } catch (error) {
+    console.error('Erro ao inserir oração:', error);
+    throw error;
+  }
+}
+
+// Função para buscar oração por release_date
+export async function getPrayerByReleaseDate(releaseDate: string): Promise<{ id: number; title: string; content: string; release_date: string } | null> {
+  try {
+    const db = await getDB();
+    const rows = await db.getAllAsync<{ id: number; title: string; content: string; release_date: string }>(
+      'SELECT id, title, content, release_date FROM prayers WHERE release_date = ?',
+      [releaseDate]
+    );
+    return rows?.[0] ?? null;
+  } catch (error) {
+    console.error('Erro ao buscar oração por data de divulgação:', error);
+    return null;
+  }
 }
 
 /* ===================== Helpers Internos ===================== */
