@@ -3,8 +3,8 @@
 // - Usa services/http para timeout/erros consistentes.
 // - Não expõe secrets (apenas EXPO_PUBLIC_CLAUDE_PROXY_URL).
 
-import Constants from 'expo-constants';
 import { postJson } from '@/services/http';
+import Constants from 'expo-constants';
 
 const ENV_URL =
   (typeof process !== 'undefined' && process.env?.EXPO_PUBLIC_CLAUDE_PROXY_URL) ||
@@ -22,7 +22,7 @@ function getBaseUrl(): string {
 
 export async function generateCustomPrayer(prompt: string, opts?: { signal?: AbortSignal }): Promise<string> {
   const base = getBaseUrl();
-  const data = await postJson<{ text?: string }>(`${base}/v1/prayer`, { prompt }, { timeoutMs: 30000, signal: opts?.signal });
+  const data = await postJson<{ text?: string }>(`${base}/v1/prayer`, { prompt }, { timeoutMs: 25000, signal: opts?.signal });
   if (!data?.text) throw new Error('Resposta inválida do servidor.');
   return String(data.text).trim();
 }

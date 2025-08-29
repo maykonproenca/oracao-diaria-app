@@ -76,7 +76,7 @@ export default function CalendarMonth({ matrix }: Props) {
       </View>
 
       {/* Legenda */}
-      <View style={{ flexDirection: 'row', gap: spacing(3), marginTop: spacing(1.5), alignItems: 'center' }}>
+      <View style={{ flexDirection: 'row', gap: spacing(3), marginTop: spacing(1.5), alignItems: 'center', justifyContent: 'center' }}>
         <Legend color={colors.todayBorder} label="Hoje" border />
         <Legend color={colors.completedBg} label="Concluído" />
         <Legend color={colors.outOfMonthBg} label="Fora do mês" />

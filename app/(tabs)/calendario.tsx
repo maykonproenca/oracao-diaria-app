@@ -53,8 +53,13 @@ export default function CalendarioScreen() {
       contentContainerStyle={{ padding: spacing(4), gap: spacing(4) }}
       refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} />}
     >
-      {/* Título da tela */}
-      <ThemedText size="h1" weight="800">Calendário</ThemedText>
+      {/* Barra de Progresso de Streaks */}
+      <StreakProgressBar
+        currentStreak={stats?.currentStreak ?? 0}
+        longestStreak={stats?.longestStreak ?? 0}
+        totalCompleted={stats?.totalCompleted ?? 0}
+      />
+
       {/* Cabeçalho com navegação */}
       <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
         <NavButton dir="left" onPress={() => setViewDate(addMonths(viewDate, -1))} />
@@ -76,15 +81,21 @@ export default function CalendarioScreen() {
 
       {!loading && !error && matrix && <CalendarMonth matrix={matrix as any} />}
       
-      {/* Espaçamento adicional */}
-      <View style={{ height: spacing(2) }} />
+      {/* Espaçamento */}
+      <View style={{ height: spacing(4) }} />
       
-      {/* Barra de Progresso de Streaks */}
-      <StreakProgressBar
-        currentStreak={stats?.currentStreak ?? 0}
-        longestStreak={stats?.longestStreak ?? 0}
-        totalCompleted={stats?.totalCompleted ?? 0}
-      />
+      {/* Frase motivacional */}
+      <ThemedText 
+        size="body" 
+        style={{ 
+          fontSize: 15, 
+          fontStyle: 'italic', 
+          textAlign: 'center',
+          marginBottom: spacing(2)
+        }}
+      >
+        Você está a {stats?.currentStreak ?? 0} dias orando! 🙏
+      </ThemedText>
     </ScrollView>
   );
 

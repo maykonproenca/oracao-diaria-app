@@ -4,10 +4,39 @@ import { ThemedText, useTheme } from '@/components/ui/Themed';
 import { useToast } from '@/components/ui/ToastProvider';
 import { generateCustomPrayer } from '@/services/aiService';
 import { buildShareMessage, copyToClipboard, shareSystem, shareWhatsApp } from '@/services/shareService';
+import { saveCustomPrayerToHistory } from '@/utils/db';
+import { router } from 'expo-router';
 import React, { useCallback, useMemo, useRef, useState } from 'react';
 import { ActivityIndicator, Pressable, ScrollView, TextInput, View } from 'react-native';
 function countWords(s: string): number {
   return s.trim().split(/\s+/).filter(Boolean).length;
+}
+
+// Função para extrair apenas o texto da oração da resposta formatada da API
+function extractPrayerText(apiResponse: string): string {
+  // Remove o título markdown e o rodapé, mantendo apenas a oração
+  const lines = apiResponse.split('\n');
+  const prayerLines: string[] = [];
+  let inPrayerSection = false;
+  
+  for (const line of lines) {
+    // Pula o título (## 🙏 **...**)
+    if (line.startsWith('## 🙏')) continue;
+    
+    // Pula linhas vazias no início
+    if (!inPrayerSection && line.trim() === '') continue;
+    
+    // Para quando encontrar o separador (---)
+    if (line.trim() === '---') break;
+    
+    // Adiciona a linha se não for o título
+    if (line.trim() !== '') {
+      inPrayerSection = true;
+      prayerLines.push(line);
+    }
+  }
+  
+  return prayerLines.join('\n').trim();
 }
 export default function PersonalizadaScreen() {
   const { colors, radius, spacing } = useTheme();
@@ -31,7 +60,17 @@ export default function PersonalizadaScreen() {
     abortRef.current = controller;
     try {
       const prayer = await generateCustomPrayer(trimmed, { signal: controller.signal });
-      setResult(prayer);
+      const extractedPrayer = extractPrayerText(prayer);
+      setResult(extractedPrayer);
+      
+      // Salva no histórico
+      try {
+        await saveCustomPrayerToHistory(trimmed, prayer);
+      } catch (historyError) {
+        console.warn('Erro ao salvar no histórico:', historyError);
+        // Não falha a geração se o histórico der erro
+      }
+      
       toast.show({ type: 'success', message: 'Oração gerada com sucesso.' });
     } catch (e: any) {
       setError(e?.message ?? 'Falha ao gerar a oração.');
@@ -84,17 +123,28 @@ export default function PersonalizadaScreen() {
       keyboardShouldPersistTaps="handled"
     >
       {/* Título da tela */}
-      <ThemedText size="h1" weight="800">Personalizada</ThemedText>
-      <View
-        style={{
-          backgroundColor: colors.surface,
-          borderColor: colors.border,
-          borderWidth: 1,
-          borderRadius: radius.md,
-          padding: spacing(4),
-          gap: spacing(3),
+      <ThemedText 
+        size="h1" 
+        weight="800" 
+        style={{ 
+          textAlign: 'center',
+          fontSize: 22 // h1 normalmente é 30px, então 30-2 = 28px
         }}
       >
+        Pelo que você quer Orar hoje?
+      </ThemedText>
+      {/* Formulário de entrada - só aparece se não há resultado */}
+      {!result && (
+        <View
+          style={{
+            backgroundColor: colors.surface,
+            borderColor: colors.border,
+            borderWidth: 1,
+            borderRadius: radius.md,
+            padding: spacing(4),
+            gap: spacing(3),
+          }}
+        >
         <ThemedText tone="muted">
           Descreva seu pedido em até <ThemedText weight="800">20 palavras</ThemedText>. Ex.: “agradecimento pela família e sabedoria nas decisões”.
         </ThemedText>
@@ -111,7 +161,7 @@ export default function PersonalizadaScreen() {
             borderColor: colors.border,
             padding: spacing(3),
             color: colors.text,
-            backgroundColor: colors.mode === 'dark' ? '#0b1220' : '#f9fafb',
+            backgroundColor: '#f9fafb',
             textAlignVertical: 'top',
           }}
         />
@@ -141,6 +191,7 @@ export default function PersonalizadaScreen() {
           </View>
         )}
       </View>
+      )}
       {result && (
         <View
           style={{
@@ -152,15 +203,36 @@ export default function PersonalizadaScreen() {
             gap: spacing(3),
           }}
         >
-          <ThemedText size="h2" weight="800">Sua oração</ThemedText>
           <ThemedText style={{ lineHeight: 22 }}>{result}</ThemedText>
           <View style={{ flexDirection: 'row', gap: spacing(3), flexWrap: 'wrap' }}>
             <Secondary title="Copiar" onPress={onCopy} />
             <Secondary title="Compartilhar" onPress={onShare} />
             <Secondary title="WhatsApp" onPress={onShareWA} />
+            <Secondary title="Nova Oração" onPress={onClear} />
           </View>
         </View>
       )}
+      
+      {/* Espaçamento */}
+      <View style={{ height: spacing(4) }} />
+      
+      {/* Botão Histórico */}
+      <Pressable
+        onPress={() => {
+          router.push('/historico');
+        }}
+        style={({ pressed }) => ({
+          backgroundColor: pressed ? '#d4a574' : '#f5e6d3',
+          paddingVertical: spacing(2),
+          paddingHorizontal: spacing(3),
+          borderRadius: radius.sm,
+          borderWidth: 1,
+          borderColor: '#d4a574',
+          alignSelf: 'center',
+        })}
+      >
+        <ThemedText size="small" style={{ color: '#8b4513' }}>Histórico</ThemedText>
+      </Pressable>
     </ScrollView>
   );
   function Primary({ title, onPress, disabled }: { title: string; onPress?: () => void; disabled?: boolean }) {

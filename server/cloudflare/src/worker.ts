@@ -51,16 +51,18 @@ export interface Env {
           }
   
           const system = [
-            "Você é um assistente que escreve orações respeitosas e bíblicas em português do Brasil.",
-            "Objetivo: gerar UMA oração com ~300–400 palavras, tom acolhedor, simples e reverente.",
-            "Estrutura: 3–4 parágrafos curtos e termine com 'Amém.'.",
-            "Evite fazer promessas milagrosas, conselhos médicos/legais específicos ou ataques a outras religiões.",
+            "Você é um assistente que cria orações evangélicas no estilo 'Café com Deus Pai'.",
+            "ESTILO: Linguagem simples e conversacional. Trate Deus como 'Pai' ou 'Deus' naturalmente.",
+            "ESTRUTURA: Abertura (15-20 palavras) + Corpo (60-70 palavras) + Fechamento (10-20 palavras) com 'Em nome de Jesus, amém'",
+            "LIMITE: Máximo 100 palavras (conte todas as palavras, incluindo artigos e preposições)",
+            "FORMATO: ## 🙏 **[MOTIVO EM NEGRITO]** + [ORAÇÃO] + --- + **Total: [NÚMERO]** + 💙 *Salmos 55:22*",
+            "IMPORTANTE: Respeite rigorosamente o limite de 100 palavras. Não ultrapasse este limite."
           ].join(" ");
   
           const body = {
-            model: env.ANTHROPIC_MODEL || "claude-sonnet-4-20250514",
-            max_tokens: 700,         // suficiente para ~300–400 palavras
-            temperature: 0.7,        // um pouco de criatividade
+            model: env.ANTHROPIC_MODEL || "claude-3-5-haiku-20241022",
+            max_tokens: 300,         // suficiente para ~100 palavras
+            temperature: 0.6,        // menos criatividade = respostas mais rápidas e diretas
             system,                  // system prompt (instruções)
             messages: [
               {
@@ -68,9 +70,8 @@ export interface Env {
                 content: [
                   {
                     type: "text",
-                    text:
-                      `Gere uma oração em pt-BR com base neste pedido (máx. 20 palavras): "${prompt.trim()}". ` +
-                      "Siga a estrutura, mantenha ~300–400 palavras e finalize com 'Amém.'.",
+                                    text:
+                  `Gere uma oração estilo 'Café com Deus Pai' para: "${prompt.trim()}". LIMITE RIGOROSO: máximo 100 palavras. Conte todas as palavras e não ultrapasse este limite.`,
                   },
                 ],
               },
@@ -78,7 +79,7 @@ export interface Env {
           };
   
           const controller = new AbortController();
-          const to = setTimeout(() => controller.abort(), 30000); // timeout 30s
+          const to = setTimeout(() => controller.abort(), 20000); // timeout 20s (otimizado para 100 palavras)
   
           const resp = await fetch("https://api.anthropic.com/v1/messages", {
             method: "POST",

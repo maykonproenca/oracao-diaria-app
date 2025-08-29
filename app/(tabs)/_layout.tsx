@@ -84,7 +84,7 @@ export default function TabsLayout() {
             <Tabs.Screen 
               name="personalizada" 
               options={{ 
-                title: 'Personalizada',
+                title: 'Pedidos',
                 headerTitle: () => <HeaderLogo />,
                 tabBarIcon: ({ color, size }) => (
                   <Ionicons name="book" size={size} color={color} />

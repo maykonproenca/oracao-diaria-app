@@ -55,6 +55,13 @@ export async function getDB(): Promise<SQLite.SQLiteDatabase> {
         notification_hour INTEGER NOT NULL DEFAULT 8,
         notification_minute INTEGER NOT NULL DEFAULT 0
       );
+
+      CREATE TABLE IF NOT EXISTS custom_prayers_history (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        request TEXT NOT NULL,
+        generated_prayer TEXT NOT NULL,
+        created_at TEXT NOT NULL
+      );
     `);
 
     // Migração leve: adiciona coluna notif_schedule_id se não existir
@@ -332,6 +339,45 @@ export async function getPrayerByReleaseDate(releaseDate: string): Promise<{ id:
   } catch (error) {
     console.error('Erro ao buscar oração por data de divulgação:', error);
     return null;
+  }
+}
+
+/* ===================== Histórico de Orações Personalizadas ===================== */
+
+export async function saveCustomPrayerToHistory(request: string, generatedPrayer: string): Promise<void> {
+  try {
+    const db = await getDB();
+    const now = new Date().toISOString();
+    await db.runAsync(
+      'INSERT INTO custom_prayers_history (request, generated_prayer, created_at) VALUES (?, ?, ?)',
+      [request, generatedPrayer, now]
+    );
+  } catch (error) {
+    console.error('Erro ao salvar oração personalizada no histórico:', error);
+    throw error;
+  }
+}
+
+export async function getCustomPrayersHistory(): Promise<{ id: number; request: string; generated_prayer: string; created_at: string }[]> {
+  try {
+    const db = await getDB();
+    const rows = await db.getAllAsync<{ id: number; request: string; generated_prayer: string; created_at: string }>(
+      'SELECT id, request, generated_prayer, created_at FROM custom_prayers_history ORDER BY created_at DESC'
+    );
+    return rows ?? [];
+  } catch (error) {
+    console.error('Erro ao buscar histórico de orações personalizadas:', error);
+    return [];
+  }
+}
+
+export async function deleteCustomPrayerFromHistory(id: number): Promise<void> {
+  try {
+    const db = await getDB();
+    await db.runAsync('DELETE FROM custom_prayers_history WHERE id = ?', [id]);
+  } catch (error) {
+    console.error('Erro ao deletar oração personalizada do histórico:', error);
+    throw error;
   }
 }
 
