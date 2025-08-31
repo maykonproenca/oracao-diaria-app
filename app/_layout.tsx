@@ -7,6 +7,14 @@ export default function RootLayout() {
       {/* Configuração da navegação principal */}
       <Stack>
         <Stack.Screen 
+          name="splash" 
+          options={{ 
+            headerShown: false,
+            gestureEnabled: false,
+            animation: 'none'
+          }} 
+        />
+        <Stack.Screen 
           name="(tabs)" 
           options={{ headerShown: false }} 
         />
@@ -22,8 +30,7 @@ export default function RootLayout() {
           name="niveis-streak" 
           options={{ 
             title: 'Níveis de Streak',
-            headerShown: true,
-            headerBackTitle: 'Voltar'
+            headerShown: false,
           }} 
         />
         <Stack.Screen 
@@ -33,13 +40,17 @@ export default function RootLayout() {
       </Stack>
       
       {/* StatusBar define a cor da barra de status do celular */}
-      <StatusBar style="auto" />
+      <StatusBar 
+        style="dark" 
+        animated={true}
+      />
     </>
   );
 }
-
 // Comentários explicativos:
 // - Stack: Sistema de navegação em pilha (uma tela sobre a outra)
+// - splash: Tela de splash com vídeo que será exibida primeiro
 // - (tabs): Pasta que contém as abas principais do app
 // - headerShown: false: Remove o cabeçalho padrão das telas
 // - StatusBar: Controla a aparência da barra superior do celular
+// - Removidas propriedades backgroundColor e translucent para compatibilidade com edge-to-edge

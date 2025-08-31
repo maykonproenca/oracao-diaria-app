@@ -5,7 +5,7 @@ import CalendarMonth from '@/components/CalendarMonth';
 import ErrorState from '@/components/ErrorState';
 import StreakProgressBar from '@/components/StreakProgressBar';
 import { ThemedText, useTheme } from '@/components/ui/Themed';
-import { useTodayPrayer } from '@/hooks/useTodayPrayer';
+import { usePrayerUpdates } from '@/hooks/usePrayerUpdates';
 import { loadMonth } from '@/services/progressService';
 import { addMonths, monthTitle } from '@/utils/date';
 import React, { useCallback, useEffect, useState } from 'react';
@@ -13,7 +13,7 @@ import { ActivityIndicator, Pressable, RefreshControl, ScrollView, View } from '
 
 export default function CalendarioScreen() {
   const { colors, radius, spacing } = useTheme();
-  const { stats } = useTodayPrayer();
+  const { stats, refreshStats } = usePrayerUpdates();
 
   const [viewDate, setViewDate] = useState<Date>(new Date());
   const [loading, setLoading] = useState(true);

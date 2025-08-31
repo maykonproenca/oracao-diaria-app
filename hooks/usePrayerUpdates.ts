@@ -2,12 +2,15 @@
 // Hook para gerenciar atualizações de orações e mostrar feedback ao usuário
 
 import { useToast } from '@/components/ui/ToastProvider';
+import { getStats } from '@/services/prayerService';
 import { checkAndUpdatePrayers, forceUpdateCheck, type UpdateResult } from '@/services/prayerUpdateService';
+import { useFocusEffect } from '@react-navigation/native';
 import { useCallback, useState } from 'react';
 
 export function usePrayerUpdates() {
   const [isChecking, setIsChecking] = useState(false);
   const [lastUpdate, setLastUpdate] = useState<UpdateResult | null>(null);
+  const [stats, setStats] = useState<{ currentStreak: number; longestStreak: number; totalCompleted: number } | null>(null);
   const toast = useToast();
 
   const checkUpdates = useCallback(async (showFeedback = true): Promise<UpdateResult> => {
@@ -70,10 +73,30 @@ export function usePrayerUpdates() {
     }
   }, [toast]);
 
+  const refreshStats = useCallback(async () => {
+    try {
+      const newStats = await getStats();
+      setStats(newStats);
+      return newStats;
+    } catch (error: any) {
+      console.error('Erro ao atualizar estatísticas:', error);
+      throw error;
+    }
+  }, []);
+
+  // Atualiza estatísticas quando a tela ganha foco
+  useFocusEffect(
+    useCallback(() => {
+      refreshStats();
+    }, [refreshStats])
+  );
+
   return {
     isChecking,
     lastUpdate,
+    stats,
     checkUpdates,
     forceCheck,
+    refreshStats,
   };
 }

@@ -66,12 +66,22 @@ export function useTodayPrayer() {
     load();
   }, [load]);
 
+  const refreshStats = useCallback(async () => {
+    try {
+      const stats = await getStats();
+      setState((s) => ({ ...s, stats }));
+    } catch (e: any) {
+      console.error('Erro ao atualizar stats:', e);
+    }
+  }, []);
+
   return useMemo(
     () => ({
       ...state,
       reload: load,
       complete,
+      refreshStats,
     }),
-    [state, load, complete]
+    [state, load, complete, refreshStats]
   );
 }

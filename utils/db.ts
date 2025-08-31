@@ -65,7 +65,8 @@ export async function getDB(): Promise<SQLite.SQLiteDatabase> {
         notification_enabled INTEGER NOT NULL DEFAULT 0,
         notification_hour INTEGER NOT NULL DEFAULT 8,
         notification_minute INTEGER NOT NULL DEFAULT 0,
-        notif_schedule_id TEXT
+        notif_schedule_id TEXT,
+        notification_schedules TEXT
       );
 
       -- Histórico de orações personalizadas (dados pessoais)
@@ -86,6 +87,17 @@ export async function getDB(): Promise<SQLite.SQLiteDatabase> {
       }
     } catch (error) {
       console.warn('Erro na migração do banco:', error);
+    }
+
+    // Migração: adiciona coluna notification_schedules se não existir
+    try {
+      const cols = await _db.getAllAsync<{ name: string }>('PRAGMA table_info(user_settings)');
+      const names = new Set(cols.map(c => c.name));
+      if (!names.has('notification_schedules')) {
+        await _db.execAsync(`ALTER TABLE user_settings ADD COLUMN notification_schedules TEXT;`);
+      }
+    } catch (error) {
+      console.warn('Erro na migração do banco (notification_schedules):', error);
     }
 
     // Migração: adiciona coluna release_date se não existir
@@ -476,6 +488,7 @@ export type UserSettings = {
   notification_hour: number;
   notification_minute: number;
   notif_schedule_id: string | null;
+  notification_schedules: any[] | null;
 };
 
 async function ensureUserSettingsRow(): Promise<void> {
@@ -484,8 +497,8 @@ async function ensureUserSettingsRow(): Promise<void> {
     const row = await db.getAllAsync<{ id: number }>('SELECT id FROM user_settings WHERE id = 1');
     if (!row || row.length === 0) {
       await db.runAsync(
-        `INSERT INTO user_settings(id, notification_enabled, notification_hour, notification_minute, notif_schedule_id)
-         VALUES (1, 0, 8, 0, NULL);`
+        `INSERT INTO user_settings(id, notification_enabled, notification_hour, notification_minute, notif_schedule_id, notification_schedules)
+         VALUES (1, 0, 8, 0, NULL, NULL);`
       );
     }
   } catch (error) {
@@ -516,14 +529,25 @@ export async function getUserSettings(): Promise<UserSettings> {
     const db = await getDB();
     await ensureUserSettingsRow();
     const rows = await db.getAllAsync<UserSettings & { id: number }>(
-      'SELECT notification_enabled, notification_hour, notification_minute, notif_schedule_id FROM user_settings WHERE id = 1'
+      'SELECT notification_enabled, notification_hour, notification_minute, notif_schedule_id, notification_schedules FROM user_settings WHERE id = 1'
     );
     const r = rows?.[0];
+    
+    let notification_schedules = null;
+    if (r?.notification_schedules) {
+      try {
+        notification_schedules = JSON.parse(r.notification_schedules);
+      } catch (error) {
+        console.warn('Erro ao fazer parse das configurações de notificação:', error);
+      }
+    }
+    
     return {
       notification_enabled: (r?.notification_enabled ?? 0) as 0 | 1,
       notification_hour: r?.notification_hour ?? 8,
       notification_minute: r?.notification_minute ?? 0,
       notif_schedule_id: r?.notif_schedule_id ?? null,
+      notification_schedules: notification_schedules,
     };
   } catch (error) {
     console.error('Erro ao obter configurações do usuário:', error);
@@ -533,6 +557,7 @@ export async function getUserSettings(): Promise<UserSettings> {
       notification_hour: 8,
       notification_minute: 0,
       notif_schedule_id: null,
+      notification_schedules: null,
     };
   }
 }
@@ -546,13 +571,14 @@ export async function saveUserSettings(partial: Partial<UserSettings>): Promise<
   const db = await getDB();
   await db.runAsync(
     `UPDATE user_settings
-     SET notification_enabled = ?, notification_hour = ?, notification_minute = ?, notif_schedule_id = ?
+     SET notification_enabled = ?, notification_hour = ?, notification_minute = ?, notif_schedule_id = ?, notification_schedules = ?
      WHERE id = 1;`,
     [
       next.notification_enabled,
       next.notification_hour,
       next.notification_minute,
       next.notif_schedule_id,
+      next.notification_schedules ? JSON.stringify(next.notification_schedules) : null,
     ]
   );
 }

@@ -152,7 +152,7 @@ export default function HistoricoScreen() {
                     backgroundColor: pressed ? colors.dangerBg : 'transparent',
                   })}
                 >
-                  <Ionicons name="trash-outline" size={20} color={colors.danger} />
+                  <Ionicons name="trash-outline" size={20} color={colors.dangerBg} />
                 </Pressable>
               </View>
 

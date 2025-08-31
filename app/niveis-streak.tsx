@@ -1,9 +1,13 @@
 // app/niveis-streak.tsx
 // Tela que mostra o contexto dos níveis de streak
 
+import { StreakHeader } from '@/components/StreakHeader';
 import { ThemedText, useTheme } from '@/components/ui/Themed';
+import { Ionicons } from '@expo/vector-icons';
+import { router } from 'expo-router';
 import React from 'react';
-import { ScrollView, View } from 'react-native';
+import { Platform, Pressable, ScrollView, View } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 type StreakLevel = {
   name: string;
@@ -67,18 +71,40 @@ const STREAK_LEVELS: StreakLevel[] = [
 
 export default function NiveisStreakScreen() {
   const { colors, spacing, radius } = useTheme();
+  const insets = useSafeAreaInsets();
 
   return (
-    <View style={{ flex: 1, backgroundColor: colors.background }}>
-      {/* Header */}
-      <View style={{
-        paddingHorizontal: spacing(4),
-        paddingVertical: spacing(1),
-      }} />
+    <View style={{ 
+      flex: 1, 
+      backgroundColor: colors.background,
+    }}>
+      {/* Header personalizado */}
+      <StreakHeader title="Níveis de Streak" />
+      
+      {/* Botão de voltar */}
+      <Pressable
+        onPress={() => router.back()}
+        style={({ pressed }) => ({
+          position: 'absolute',
+          top: Platform.OS === 'ios' ? insets.top + 12 : 12,
+          left: 16,
+          zIndex: 10,
+          padding: 8,
+          borderRadius: 20,
+          backgroundColor: pressed ? 'rgba(0,0,0,0.1)' : 'transparent',
+        })}
+      >
+        <Ionicons name="arrow-back" size={24} color="#000000" />
+      </Pressable>
 
       <ScrollView 
         style={{ flex: 1 }}
-        contentContainerStyle={{ padding: spacing(4), gap: spacing(4) }}
+        contentContainerStyle={{ 
+          padding: spacing(4), 
+          gap: spacing(4),
+          paddingBottom: insets.bottom + spacing(4),
+        }}
+        showsVerticalScrollIndicator={false}
       >
         {/* Introdução */}
         <View style={{
@@ -89,7 +115,7 @@ export default function NiveisStreakScreen() {
           padding: spacing(4),
           gap: spacing(2),
         }}>
-          <ThemedText size="h3" weight="700">Como funcionam os níveis?</ThemedText>
+          <ThemedText size="h2" weight="800">Como funcionam os níveis?</ThemedText>
           <ThemedText tone="muted" size="small">
             Cada nível representa uma conquista na sua jornada de oração. Quanto mais dias seguidos você orar, 
             mais alto será seu nível. É como subir uma escada espiritual - cada degrau te aproxima mais de Deus!
@@ -124,7 +150,7 @@ export default function NiveisStreakScreen() {
                 </View>
                 
                 <View style={{ flex: 1 }}>
-                  <ThemedText size="h3" weight="700">{level.name}</ThemedText>
+                  <ThemedText size="h2" weight="800">{level.name}</ThemedText>
                   <ThemedText size="small" tone="muted">
                     {level.min} - {level.max === Infinity ? '∞' : level.max} dias
                   </ThemedText>

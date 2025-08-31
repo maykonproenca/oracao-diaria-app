@@ -8,16 +8,10 @@
     "icon": "./assets/images/icon.png",
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
-    "fonts": [
-      {
-        "asset": "./assets/fonts/IntroRust.otf",
-        "family": "IntroRust"
-      }
-    ],
     "splash": {
       "image": "./assets/images/splash-icon.png",
       "resizeMode": "contain",
-      "backgroundColor": "#ffffff"
+      "backgroundColor": "#000000"
     },
     "android": {
       "package": "com.seuprojeto.oracaodiaria",
@@ -25,7 +19,9 @@
       "adaptiveIcon": {
         "foregroundImage": "./assets/images/adaptive-icon.png",
         "backgroundColor": "#ffffff"
-      }
+      },
+      "softwareKeyboardLayoutMode": "pan",
+      "allowBackup": true
     },
     "ios": {
       "bundleIdentifier": "com.seuprojeto.oracaodiaria",
@@ -42,15 +38,16 @@
     "plugins": [
       "expo-router",
       [
-        "expo-splash-screen",
+        "expo-font",
         {
-          "image": "./assets/images/splash-icon.png",
-          "imageWidth": 200,
-          "resizeMode": "contain",
-          "backgroundColor": "#ffffff"
+          "fonts": [
+            "./assets/fonts/IntroRust.otf"
+          ]
         }
       ],
+      // "expo-splash-screen",
       "expo-sqlite",
+      "expo-av",
       [
         "expo-notifications",
         {
@@ -59,6 +56,18 @@
           "sounds": [
             "./assets/sounds/notification.wav"
           ]
+        }
+      ],
+      [
+        "expo-build-properties",
+        {
+          "android": {
+            "compileSdkVersion": 35,
+            "targetSdkVersion": 35,
+            "buildToolsVersion": "35.0.0",
+            "enableProguardInReleaseBuilds": false,
+            "enableSeparateBuildPerCPUArchitecture": false
+          }
         }
       ]
     ],

@@ -12,6 +12,8 @@ Notifications.setNotificationHandler({
     shouldShowAlert: true,      // exibe banner/alerta
     shouldPlaySound: true,      // toca som (se habilitado)
     shouldSetBadge: false,
+    shouldShowBanner: true,     // exibe banner
+    shouldShowList: true,       // mostra na lista de notificações
   }),
 });
 
@@ -54,11 +56,12 @@ export async function scheduleDailyReminder(hour: number, minute: number): Promi
       priority: Notifications.AndroidNotificationPriority.HIGH,
     },
     trigger: {
+      type: Notifications.SchedulableTriggerInputTypes.DAILY,
       hour,
       minute,
       repeats: true, // repete todos os dias neste horário
       channelId: Platform.OS === 'android' ? ANDROID_CHANNEL_ID : undefined,
-    } as Notifications.DailyTriggerInput,
+    },
   });
 
   return id;
@@ -78,7 +81,10 @@ export async function sendTestNotification() {
       body: 'Se você está vendo isto, está tudo certo! 🎉',
       sound: 'default',
     },
-    trigger: { seconds: 5 },
+    trigger: { 
+      type: Notifications.SchedulableTriggerInputTypes.TIME_INTERVAL,
+      seconds: 5 
+    },
   });
 }
 

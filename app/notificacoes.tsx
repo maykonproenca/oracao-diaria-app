@@ -3,20 +3,24 @@
 
 import { ThemedText, useTheme } from '@/components/ui/Themed';
 import { useToast } from '@/components/ui/ToastProvider';
-import { applyNotificationSettings, requestNotificationPermission, sendTestNotification } from '@/services/notificationService';
+import { applyNotificationSettings, requestNotificationPermission } from '@/services/notificationService';
 import { getUserSettings } from '@/utils/db';
 import React, { useCallback, useEffect, useState } from 'react';
-import { ActivityIndicator, Pressable, Switch, View } from 'react-native';
+import { ActivityIndicator, Pressable, Switch, TouchableOpacity, View } from 'react-native';
 
 type UIState = {
   loading: boolean;
   saving: boolean;
   error: string | null;
   enabled: boolean;
-  hour: number;
-  minute: number;
   permissionKnown: boolean;
   permissionGranted: boolean;
+};
+
+type TimeSchedule = {
+  id: string;
+  hour: number;
+  minute: number;
 };
 
 export default function NotificacoesScreen() {
@@ -28,11 +32,13 @@ export default function NotificacoesScreen() {
     saving: false,
     error: null,
     enabled: false,
-    hour: 8,
-    minute: 0,
     permissionKnown: false,
     permissionGranted: false,
   });
+
+  const [timeSchedules, setTimeSchedules] = useState<TimeSchedule[]>([
+    { id: '1', hour: 22, minute: 0 }
+  ]);
 
   const load = useCallback(async () => {
     setState(s => ({ ...s, loading: true, error: null }));
@@ -42,9 +48,20 @@ export default function NotificacoesScreen() {
         ...prev,
         loading: false,
         enabled: s.notification_enabled === 1,
-        hour: clampHour(s.notification_hour),
-        minute: clampMinute(s.notification_minute),
       }));
+      
+      // Carregar horários salvos ou usar padrão
+      if (s.notification_schedules && Array.isArray(s.notification_schedules) && s.notification_schedules.length > 0) {
+        // Validar e corrigir os dados carregados
+        const validSchedules = s.notification_schedules.map(schedule => ({
+          id: schedule.id || Date.now().toString(),
+          hour: typeof schedule.hour === 'number' && !isNaN(schedule.hour) ? schedule.hour : 22,
+          minute: typeof schedule.minute === 'number' && !isNaN(schedule.minute) ? schedule.minute : 0,
+        }));
+        setTimeSchedules(validSchedules);
+      } else {
+        setTimeSchedules([{ id: '1', hour: 22, minute: 0 }]);
+      }
       try {
         const granted = await requestNotificationPermission();
         setState(prev => ({ ...prev, permissionKnown: true, permissionGranted: granted }));
@@ -63,10 +80,13 @@ export default function NotificacoesScreen() {
   const save = useCallback(async () => {
     setState(s => ({ ...s, saving: true, error: null }));
     try {
+      // Salvar apenas o primeiro horário por enquanto (compatibilidade)
+      const firstSchedule = timeSchedules[0] || { hour: 22, minute: 0 };
       await applyNotificationSettings({
         notification_enabled: state.enabled ? 1 : 0,
-        notification_hour: state.hour,
-        notification_minute: state.minute,
+        notification_hour: firstSchedule.hour,
+        notification_minute: firstSchedule.minute,
+        notification_schedules: timeSchedules,
       });
       toast.show({ type: 'success', message: 'Preferências salvas.' });
     } catch (e: any) {
@@ -75,31 +95,37 @@ export default function NotificacoesScreen() {
       return;
     }
     setState(s => ({ ...s, saving: false }));
-  }, [state.enabled, state.hour, state.minute, toast]);
+  }, [state.enabled, timeSchedules, toast]);
 
-  const askPermission = useCallback(async () => {
-    try {
-      const granted = await requestNotificationPermission();
-      setState(prev => ({ ...prev, permissionKnown: true, permissionGranted: granted }));
-      toast.show({
-        type: granted ? 'success' : 'error',
-        message: granted ? 'Permissão concedida.' : 'Permissão negada. Ajuste nas configurações do sistema.',
-      });
-    } catch (e: any) {
-      setState(prev => ({ ...prev, error: e?.message ?? 'Erro ao solicitar permissão' }));
-      toast.show({ type: 'error', message: e?.message ?? 'Erro ao solicitar permissão' });
+  const handleToggleNotifications = useCallback(async (value: boolean) => {
+    // Se está tentando ativar e não tem permissão, solicitar primeiro
+    if (value && !state.permissionGranted) {
+      try {
+        const granted = await requestNotificationPermission();
+        setState(prev => ({ 
+          ...prev, 
+          permissionKnown: true, 
+          permissionGranted: granted,
+          enabled: granted // Só ativa se a permissão foi concedida
+        }));
+        
+        if (granted) {
+          toast.show({ type: 'success', message: 'Permissão concedida! Notificações ativadas.' });
+        } else {
+          toast.show({ type: 'error', message: 'Permissão negada. As notificações permanecerão desativadas.' });
+          return; // Não ativa o switch se a permissão foi negada
+        }
+      } catch (e: any) {
+        toast.show({ type: 'error', message: 'Erro ao solicitar permissão. Tente novamente.' });
+        return; // Não ativa o switch se houve erro
+      }
+    } else {
+      // Se está desativando ou já tem permissão, apenas atualiza o estado
+      setState(s => ({ ...s, enabled: value }));
     }
-  }, [toast]);
+  }, [state.permissionGranted, toast]);
 
-  const testNow = useCallback(async () => {
-    try {
-      await sendTestNotification();
-      toast.show({ type: 'success', message: 'Notificação de teste agendada para ~5s.' });
-    } catch (e: any) {
-      setState(prev => ({ ...prev, error: e?.message ?? 'Erro ao disparar teste' }));
-      toast.show({ type: 'error', message: e?.message ?? 'Erro ao disparar teste' });
-    }
-  }, [toast]);
+
 
   if (state.loading) {
     return (
@@ -121,6 +147,11 @@ export default function NotificacoesScreen() {
           </View>
         )}
 
+        <ThemedText size="body" style={{ textAlign: 'center', marginBottom: spacing(2), fontStyle: 'italic' }}>
+          Nós te ajudamos a não esquecer sua oração diária!
+        </ThemedText>
+
+        {/* Box 1: Ativar Notificações */}
         <View style={{
           backgroundColor: colors.surface,
           borderColor: colors.border,
@@ -129,19 +160,19 @@ export default function NotificacoesScreen() {
           padding: spacing(4),
           gap: spacing(3),
         }}>
-          <ThemedText size="h2" weight="800">Permissão do sistema</ThemedText>
-          <ThemedText tone="muted">
-            Status: {state.permissionKnown ? (state.permissionGranted ? 'Concedida ✅' : 'Negada ❌') : 'Desconhecido'}
-          </ThemedText>
           <Row>
-            <PrimaryButton title="Solicitar permissão" onPress={askPermission} />
-            <SecondaryButton title="Testar agora" onPress={testNow} />
+            <ThemedText size="h2" weight="800">Ativar notificações!</ThemedText>
+            <Switch value={state.enabled} onValueChange={handleToggleNotifications} />
           </Row>
-          <ThemedText size="small" tone="muted">
-            Dica: Em Android 13+ a permissão é obrigatória. Se negou antes, vá em Ajustes → Apps → Oração Diária → Notificações.
-          </ThemedText>
+
+          {!state.permissionGranted && state.permissionKnown && (
+            <ThemedText size="small" tone="danger">
+              ⚠️ Permissão negada. Toque no switch para solicitar novamente.
+            </ThemedText>
+          )}
         </View>
 
+        {/* Box 2: Configurar Horário */}
         <View style={{
           backgroundColor: colors.surface,
           borderColor: colors.border,
@@ -150,32 +181,84 @@ export default function NotificacoesScreen() {
           padding: spacing(4),
           gap: spacing(3),
         }}>
-          <Row>
-            <ThemedText size="h2" weight="800">Ativar notificações diárias</ThemedText>
-            <Switch value={state.enabled} onValueChange={(v) => setState(s => ({ ...s, enabled: v }))} />
-          </Row>
-
-          <ThemedText>Horário do lembrete</ThemedText>
-          <Row>
-            <TimeStepper
-              label="Hora"
-              value={state.hour}
-              onInc={() => setState(s => ({ ...s, hour: wrapHour(s.hour + 1) }))}
-              onDec={() => setState(s => ({ ...s, hour: wrapHour(s.hour - 1) }))}
-            />
-            <TimeStepper
-              label="Min"
-              value={state.minute}
-              onInc={() => setState(s => ({ ...s, minute: wrapMinute(s.minute + 5) }))}
-              onDec={() => setState(s => ({ ...s, minute: wrapMinute(s.minute - 5) }))}
-            />
-          </Row>
+          <ThemedText size="h2" weight="800">Horário do lembrete</ThemedText>
+          {timeSchedules.map((schedule, index) => (
+            <View key={schedule.id} style={{ position: 'relative' }}>
+              <TouchableOpacity
+                style={{
+                  position: 'absolute',
+                  top: -spacing(2),
+                  right: -spacing(2),
+                  width: 24,
+                  height: 24,
+                  borderRadius: 12,
+                  backgroundColor: colors.dangerBg,
+                  justifyContent: 'center',
+                  alignItems: 'center',
+                  zIndex: 1,
+                }}
+                onPress={() => {
+                  if (timeSchedules.length > 1) {
+                    setTimeSchedules(prev => prev.filter(s => s.id !== schedule.id));
+                  }
+                }}
+              >
+                <ThemedText size="small" tone="danger" style={{ fontSize: 12 }}>×</ThemedText>
+              </TouchableOpacity>
+              
+              <Row>
+                <TimeStepper
+                  label="Hora"
+                  value={schedule.hour}
+                  onInc={() => setTimeSchedules(prev => 
+                    prev.map(s => s.id === schedule.id ? { ...s, hour: wrapHour(s.hour + 1) } : s)
+                  )}
+                  onDec={() => setTimeSchedules(prev => 
+                    prev.map(s => s.id === schedule.id ? { ...s, hour: wrapHour(s.hour - 1) } : s)
+                  )}
+                />
+                <TimeStepper
+                  label="Min"
+                  value={schedule.minute}
+                  onInc={() => setTimeSchedules(prev => 
+                    prev.map(s => s.id === schedule.id ? { ...s, minute: wrapMinute(s.minute + 5) } : s)
+                  )}
+                  onDec={() => setTimeSchedules(prev => 
+                    prev.map(s => s.id === schedule.id ? { ...s, minute: wrapMinute(s.minute - 5) } : s)
+                  )}
+                />
+              </Row>
+            </View>
+          ))}
 
           <PrimaryButton title={state.saving ? 'Salvando...' : 'Salvar'} onPress={state.saving ? undefined : save} />
-          <ThemedText size="small" tone="muted">
-            Observação: ao salvar, qualquer agendamento antigo é removido e um novo é criado no horário definido.
-          </ThemedText>
         </View>
+
+        {/* Botão de adicionar horário */}
+        <TouchableOpacity
+          style={{
+            position: 'absolute',
+            bottom: spacing(6),
+            alignSelf: 'center',
+            width: 60,
+            height: 60,
+            borderRadius: 30,
+            backgroundColor: colors.primary,
+            justifyContent: 'center',
+            alignItems: 'center',
+            shadowColor: '#000',
+            shadowOffset: { width: 0, height: 2 },
+            shadowOpacity: 0.25,
+            shadowRadius: 4,
+            elevation: 5,
+          }}
+          onPress={() => {
+            const newId = Date.now().toString();
+            setTimeSchedules(prev => [...prev, { id: newId, hour: 8, minute: 0 }]);
+          }}
+        >
+          <ThemedText size="h2" weight="800" style={{ color: colors.primaryText }}>+</ThemedText>
+        </TouchableOpacity>
       </View>
   );
 }
@@ -222,13 +305,17 @@ function SecondaryButton({ title, onPress }: { title: string; onPress?: () => vo
 
 function TimeStepper({ label, value, onInc, onDec }: { label: string; value: number; onInc: () => void; onDec: () => void; }) {
   const { radius, spacing } = useTheme();
+  
+  // Garantir que o valor seja sempre um número válido
+  const validValue = typeof value === 'number' && !isNaN(value) ? value : 0;
+  
   return (
     <View style={{ flex: 1, gap: spacing(2) }}>
       <ThemedText size="small" tone="muted">{label}</ThemedText>
       <View style={{ flexDirection: 'row', alignItems: 'center', gap: spacing(2), justifyContent: 'space-between' }}>
         <SecondaryButton title="−" onPress={onDec} />
         <ThemedText size="h2" weight="800" style={{ minWidth: 44, textAlign: 'center' }}>
-          {String(value).padStart(2, '0')}
+          {String(validValue).padStart(2, '0')}
         </ThemedText>
         <SecondaryButton title="＋" onPress={onInc} />
       </View>

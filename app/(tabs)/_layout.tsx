@@ -9,7 +9,8 @@ import { Ionicons } from '@expo/vector-icons';
 import { useFonts } from 'expo-font';
 import { Tabs, router } from 'expo-router';
 import React, { useEffect, useState } from 'react';
-import { ActivityIndicator, Image, Pressable, View } from 'react-native';
+import { ActivityIndicator, Image, Platform, Pressable, View } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 function NotificationButton() {
   const { colors, spacing, radius } = useTheme();
@@ -44,6 +45,7 @@ function HeaderLogo() {
 
 export default function TabsLayout() {
   const [key, setKey] = useState(0);
+  const insets = useSafeAreaInsets();
   const [fontsLoaded] = useFonts({
     'IntroRust': require('../../assets/fonts/IntroRust.otf'),
   });
@@ -68,7 +70,28 @@ export default function TabsLayout() {
             key={key} 
             screenOptions={{ 
               headerShown: true,
-              headerRight: () => <NotificationButton />
+              headerRight: () => <NotificationButton />,
+              tabBarStyle: {
+                backgroundColor: '#ffffff',
+                borderTopWidth: 1,
+                borderTopColor: '#e5e5e5',
+                height: Platform.OS === 'ios' ? 60 + insets.bottom : 85,
+                paddingBottom: Platform.OS === 'ios' ? insets.bottom : 25,
+                paddingTop: 10,
+                paddingHorizontal: 10,
+              },
+              tabBarActiveTintColor: '#007AFF',
+              tabBarInactiveTintColor: '#8E8E93',
+              tabBarLabelStyle: {
+                fontSize: 11,
+                fontWeight: '500',
+                marginTop: 0,
+                marginBottom: 0,
+              },
+              tabBarIconStyle: {
+                marginTop: 0,
+                marginBottom: 0,
+              },
             }}
           >
             <Tabs.Screen 

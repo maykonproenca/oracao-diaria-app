@@ -4,6 +4,7 @@ import ErrorState from '@/components/ErrorState';
 import PrayerCard from '@/components/PrayerCard';
 import { ThemedText, ThemedView, useTheme } from '@/components/ui/Themed';
 import { useToast } from '@/components/ui/ToastProvider';
+import { usePrayerUpdates } from '@/hooks/usePrayerUpdates';
 import { useTodayPrayer } from '@/hooks/useTodayPrayer';
 import { buildShareMessage, shareWhatsApp } from '@/services/shareService';
 import { formatHuman } from '@/utils/date';
@@ -11,16 +12,19 @@ import React, { useCallback } from 'react';
 import { ActivityIndicator, RefreshControl, ScrollView, View } from 'react-native';
 export default function IndexScreen() {
   const { loading, error, data, stats, actionLoading, reload, complete } = useTodayPrayer();
+  const { refreshStats } = usePrayerUpdates();
   const { colors, spacing, radius } = useTheme();
   const toast = useToast();
   const onComplete = useCallback(async () => {
     try {
       await complete();
+      // Força atualização das estatísticas para sincronizar com outras telas
+      await refreshStats();
       toast.show({ type: 'success', message: 'Oração marcada como concluída.' });
     } catch (e: any) {
       toast.show({ type: 'error', message: e?.message ?? 'Falha ao concluir.' });
     }
-  }, [complete, toast]);
+  }, [complete, refreshStats, toast]);
 
   const onShareWhatsApp = useCallback(async () => {
     try {
@@ -82,7 +86,7 @@ export default function IndexScreen() {
       {/* Data na parte inferior */}
       <View style={{ 
         alignItems: 'center', 
-        paddingVertical: spacing(4),
+        paddingVertical: spacing(2),
         marginTop: 'auto'
       }}>
         <ThemedText size="small" tone="muted">Hoje • {dateText}</ThemedText>

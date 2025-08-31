@@ -12,7 +12,7 @@ export function sleep(ms: number) {
   ): Promise<T> {
     let timeoutId: NodeJS.Timeout;
     const timeout = new Promise<never>((_, rej) => {
-      timeoutId = setTimeout(() => rej(new Error(message)), ms);
+      timeoutId = setTimeout(() => rej(new Error(message)), ms) as any;
     });
     try {
       // Corrida entre a promise e o timeout
