@@ -22,7 +22,13 @@ function getBaseUrl(): string {
 
 export async function generateCustomPrayer(prompt: string, opts?: { signal?: AbortSignal }): Promise<string> {
   const base = getBaseUrl();
-  const data = await postJson<{ text?: string }>(`${base}/v1/prayer`, { prompt }, { timeoutMs: 25000, signal: opts?.signal });
+  
+  const data = await postJson<{ text?: string }>(
+    `${base}/v1/prayer`, 
+    { prompt }, 
+    { timeoutMs: 15000, signal: opts?.signal }
+  );
+  
   if (!data?.text) throw new Error('Resposta inválida do servidor.');
   return String(data.text).trim();
 }

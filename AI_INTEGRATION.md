@@ -10,7 +10,7 @@ O app agora possui integração com IA (Claude) para gerar orações personaliza
 ```
 services/aiService.ts     # Serviço que chama o proxy
 hooks/useAIService.ts     # Hook para gerenciar estado
-app/(tabs)/personalizada.tsx  # Interface do usuário
+app/(tabs)/pedidos.tsx    # Interface do usuário
 ```
 
 ### **Backend (Cloudflare Workers)**
@@ -41,7 +41,7 @@ npx wrangler secret put ANTHROPIC_API_KEY
 
 ### **Fluxo de Geração de Oração:**
 
-1. **Usuário** descreve o que quer orar na tela "Personalizada"
+1. **Usuário** descreve o que quer orar na tela "Pedidos"
 2. **App** envia prompt para o Cloudflare Worker
 3. **Worker** faz proxy para a API do Claude
 4. **Claude** gera oração personalizada
@@ -56,7 +56,7 @@ npx wrangler secret put ANTHROPIC_API_KEY
 
 ## 📱 Interface do Usuário
 
-### **Tela Personalizada:**
+### **Tela Pedidos:**
 - **Campo de texto**: Usuário descreve sua situação
 - **Botão "Gerar Oração"**: Inicia o processo
 - **Loading**: Indicador durante geração
@@ -91,7 +91,7 @@ npx wrangler secret put ANTHROPIC_API_KEY
 # 1. Iniciar app
 npx expo start
 
-# 2. Testar na tela "Personalizada"
+# 2. Testar na tela "Pedidos"
 # 3. Verificar logs no Worker
 npx wrangler tail
 ```

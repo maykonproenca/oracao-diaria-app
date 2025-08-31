@@ -51,17 +51,22 @@ export interface Env {
           }
   
           const system = [
-            "Você é um assistente que cria orações evangélicas no estilo 'Café com Deus Pai'.",
-            "ESTILO: Linguagem simples e conversacional. Trate Deus como 'Pai' ou 'Deus' naturalmente.",
-            "ESTRUTURA: Abertura (15-20 palavras) + Corpo (60-70 palavras) + Fechamento (10-20 palavras) com 'Em nome de Jesus, amém'",
-            "LIMITE: Máximo 100 palavras (conte todas as palavras, incluindo artigos e preposições)",
-            "FORMATO: ## 🙏 **[MOTIVO EM NEGRITO]** + [ORAÇÃO] + --- + **Total: [NÚMERO]** + 💙 *Salmos 55:22*",
-            "IMPORTANTE: Respeite rigorosamente o limite de 100 palavras. Não ultrapasse este limite."
+            "Você é um assistente especializado em criar orações evangélicas personalizadas no estilo 'Café com Deus Pai'.",
+            "ESTILO E TOM: Use linguagem simples, conversacional e íntima. Trate Deus como 'Pai', 'Deus' ou 'Senhor' de forma natural. Evite jargões teológicos complexos. Tom como se fosse uma conversa pessoal entre amigos.",
+            "ESTRUTURA OBRIGATÓRIA:",
+            "1. Abertura Calorosa (7-10 palavras) - Cumprimento íntimo: 'Oi Pai!', 'Bom dia, Deus!', 'Pai querido'",
+            "2. Corpo da Oração (30-35 palavras) - Aborde diretamente a situação/pedido do usuário. Use linguagem prática e relacionável.",
+            "3. Fechamento Confiante (10-15 palavras) - Declaração de fé. 'Em nome de Jesus, amém' sempre no final",
+            "FORMATAÇÃO: Separe a oração em parágrafos para facilitar a leitura. Cada parágrafo deve ter uma ideia principal.",
+            "LIMITE: Máximo 75 palavras (conte todas as palavras, incluindo artigos e preposições, mas desconsidere pontuação como . , !)",
+            "FORMATO: ## 🙏 **[TÍTULO RELACIONADO AO PEDIDO]** + [ORAÇÃO COMPLETA COM PARÁGRAFOS] + --- + **Total de palavras: [NÚMERO]** + 💙 *'Entregue suas preocupações ao Senhor, e ele a sustentará' - Salmos 55:22*",
+            "TEMAS COMUNS: Trabalho, relacionamentos, saúde, problemas financeiros, ansiedade, decisões, proteção, crescimento espiritual, perdão, direção de vida.",
+            "IMPORTANTE: Respeite rigorosamente o limite de 75 palavras. Não ultrapasse este limite."
           ].join(" ");
   
           const body = {
-            model: env.ANTHROPIC_MODEL || "claude-3-5-haiku-20241022",
-            max_tokens: 300,         // suficiente para ~100 palavras
+            model: env.ANTHROPIC_MODEL || "claude-sonnet-4-20250514",
+            max_tokens: 250,         // suficiente para ~75 palavras
             temperature: 0.6,        // menos criatividade = respostas mais rápidas e diretas
             system,                  // system prompt (instruções)
             messages: [
@@ -70,8 +75,7 @@ export interface Env {
                 content: [
                   {
                     type: "text",
-                                    text:
-                  `Gere uma oração estilo 'Café com Deus Pai' para: "${prompt.trim()}". LIMITE RIGOROSO: máximo 100 palavras. Conte todas as palavras e não ultrapasse este limite.`,
+                    text: `Gere uma oração personalizada estilo 'Café com Deus Pai' para: "${prompt.trim()}". LIMITE RIGOROSO: máximo 75 palavras. Conte todas as palavras e não ultrapasse este limite.`,
                   },
                 ],
               },
@@ -79,14 +83,14 @@ export interface Env {
           };
   
           const controller = new AbortController();
-          const to = setTimeout(() => controller.abort(), 20000); // timeout 20s (otimizado para 100 palavras)
+          const to = setTimeout(() => controller.abort(), 15000); // timeout 15s (otimizado para 75 palavras)
   
           const resp = await fetch("https://api.anthropic.com/v1/messages", {
             method: "POST",
             headers: {
               "content-type": "application/json",
               "x-api-key": env.ANTHROPIC_API_KEY,
-              // Versão exigida pela API
+              // Versão atual da API
               "anthropic-version": "2023-06-01",
             },
             body: JSON.stringify(body),

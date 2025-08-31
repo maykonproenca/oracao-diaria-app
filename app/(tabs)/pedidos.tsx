@@ -1,65 +1,73 @@
-// app/(tabs)/personalizada.tsx
-// Geração de oração personalizada (Claude via proxy), com toasts e tratamento de erros/timeout.
 import { ThemedText, useTheme } from '@/components/ui/Themed';
 import { useToast } from '@/components/ui/ToastProvider';
 import { generateCustomPrayer } from '@/services/aiService';
 import { buildShareMessage, copyToClipboard, shareSystem, shareWhatsApp } from '@/services/shareService';
 import { saveCustomPrayerToHistory } from '@/utils/db';
 import { router } from 'expo-router';
-import React, { useCallback, useMemo, useRef, useState } from 'react';
-import { ActivityIndicator, Pressable, ScrollView, TextInput, View } from 'react-native';
-function countWords(s: string): number {
-  return s.trim().split(/\s+/).filter(Boolean).length;
-}
+import React, { useCallback, useState } from 'react';
+import { ActivityIndicator, Pressable, ScrollView, TextInput, TouchableOpacity, View } from 'react-native';
 
-// Função para extrair apenas o texto da oração da resposta formatada da API
-function extractPrayerText(apiResponse: string): string {
-  // Remove o título markdown e o rodapé, mantendo apenas a oração
-  const lines = apiResponse.split('\n');
-  const prayerLines: string[] = [];
-  let inPrayerSection = false;
-  
-  for (const line of lines) {
-    // Pula o título (## 🙏 **...**)
-    if (line.startsWith('## 🙏')) continue;
-    
-    // Pula linhas vazias no início
-    if (!inPrayerSection && line.trim() === '') continue;
-    
-    // Para quando encontrar o separador (---)
-    if (line.trim() === '---') break;
-    
-    // Adiciona a linha se não for o título
-    if (line.trim() !== '') {
-      inPrayerSection = true;
-      prayerLines.push(line);
-    }
-  }
-  
-  return prayerLines.join('\n').trim();
-}
-export default function PersonalizadaScreen() {
-  const { colors, radius, spacing } = useTheme();
+export default function PedsScreen() {
+  const { colors, spacing, radius } = useTheme();
   const toast = useToast();
-  const [input, setInput] = useState('');
-  const [error, setError] = useState<string | null>(null);
+  const [prayerText, setPrayerText] = useState('');
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState<string | null>(null);
-  const words = useMemo(() => countWords(input), [input]);
-  const overLimit = words > 20;
-  const abortRef = useRef<AbortController | null>(null);
+  const [error, setError] = useState<string | null>(null);
+
+  // Função para contar palavras
+  const countWords = (text: string) => {
+    return text.trim().split(/\s+/).filter(word => word.length > 0).length;
+  };
+
+  // Função para limitar a 20 palavras
+  const handleTextChange = (text: string) => {
+    const wordCount = countWords(text);
+    if (wordCount <= 20) {
+      setPrayerText(text);
+    }
+  };
+
+  // Função para extrair apenas o texto da oração da resposta formatada da API
+  const extractPrayerText = (apiResponse: string): string => {
+    // Remove o título markdown e o rodapé, mantendo apenas a oração
+    const lines = apiResponse.split('\n');
+    const prayerLines: string[] = [];
+    let inPrayerSection = false;
+    
+    for (const line of lines) {
+      // Pula o título (## 🙏 **...**)
+      if (line.startsWith('## 🙏')) continue;
+      
+      // Pula linhas vazias no início
+      if (!inPrayerSection && line.trim() === '') continue;
+      
+      // Para quando encontrar o separador (---) ou "Total:"
+      if (line.trim() === '---' || line.includes('Total:')) break;
+      
+      // Adiciona a linha se não for o título
+      if (line.trim() !== '') {
+        inPrayerSection = true;
+        prayerLines.push(line);
+      } else if (inPrayerSection) {
+        // Preserva linhas vazias para manter parágrafos
+        prayerLines.push('');
+      }
+    }
+    
+    return prayerLines.join('\n').trim();
+  };
+
   const onGenerate = useCallback(async () => {
     setError(null);
     setResult(null);
-    const trimmed = input.trim();
+    const trimmed = prayerText.trim();
     const w = countWords(trimmed);
     if (!trimmed) return setError('Descreva seu pedido em até 20 palavras.');
     if (w > 20) return setError(`Você digitou ${w} palavras. O limite é 20.`);
     setLoading(true);
-    const controller = new AbortController();
-    abortRef.current = controller;
     try {
-      const prayer = await generateCustomPrayer(trimmed, { signal: controller.signal });
+      const prayer = await generateCustomPrayer(trimmed);
       const extractedPrayer = extractPrayerText(prayer);
       setResult(extractedPrayer);
       
@@ -77,20 +85,15 @@ export default function PersonalizadaScreen() {
       toast.show({ type: 'error', message: e?.message ?? 'Falha ao gerar a oração.' });
     } finally {
       setLoading(false);
-      abortRef.current = null;
     }
-  }, [input, toast]);
-  const onCancel = useCallback(() => {
-    abortRef.current?.abort();
-    abortRef.current = null;
-    setLoading(false);
-    toast.show({ type: 'info', message: 'Geração cancelada.' });
-  }, [toast]);
+  }, [prayerText, toast]);
+
   const onClear = useCallback(() => {
-    setInput('');
+    setPrayerText('');
     setResult(null);
     setError(null);
   }, []);
+
   const onCopy = useCallback(async () => {
     try {
       await copyToClipboard(result ?? '');
@@ -99,6 +102,7 @@ export default function PersonalizadaScreen() {
       toast.show({ type: 'error', message: e?.message ?? 'Não foi possível copiar.' });
     }
   }, [result, toast]);
+
   const onShare = useCallback(async () => {
     try {
       const msg = buildShareMessage({ title: 'Oração personalizada', content: result ?? '', includeLink: true });
@@ -108,6 +112,7 @@ export default function PersonalizadaScreen() {
       toast.show({ type: 'error', message: e?.message ?? 'Falha ao compartilhar.' });
     }
   }, [result, toast]);
+
   const onShareWA = useCallback(async () => {
     try {
       const msg = buildShareMessage({ title: 'Oração personalizada', content: result ?? '', includeLink: true });
@@ -116,6 +121,7 @@ export default function PersonalizadaScreen() {
       toast.show({ type: 'error', message: e?.message ?? 'Falha ao abrir o WhatsApp.' });
     }
   }, [result, toast]);
+
   return (
     <ScrollView
       style={{ flex: 1, backgroundColor: colors.background }}
@@ -128,70 +134,82 @@ export default function PersonalizadaScreen() {
         weight="800" 
         style={{ 
           textAlign: 'center',
-          fontSize: 22 // h1 normalmente é 30px, então 30-2 = 28px
+          fontSize: 22
         }}
       >
         Pelo que você quer Orar hoje?
       </ThemedText>
+
       {/* Formulário de entrada - só aparece se não há resultado */}
       {!result && (
-        <View
-          style={{
-            backgroundColor: colors.surface,
-            borderColor: colors.border,
-            borderWidth: 1,
-            borderRadius: radius.md,
-            padding: spacing(4),
-            gap: spacing(3),
-          }}
-        >
-        <ThemedText tone="muted">
-          Descreva seu pedido em até <ThemedText weight="800">20 palavras</ThemedText>. Ex.: “agradecimento pela família e sabedoria nas decisões”.
-        </ThemedText>
-        <TextInput
-          value={input}
-          onChangeText={setInput}
-          placeholder="Escreva aqui seu pedido em até 20 palavras..."
-          placeholderTextColor={colors.textMuted}
-          multiline
-          style={{
-            minHeight: 100,
-            borderRadius: radius.sm,
-            borderWidth: 1,
-            borderColor: colors.border,
-            padding: spacing(3),
-            color: colors.text,
-            backgroundColor: '#f9fafb',
-            textAlignVertical: 'top',
-          }}
-        />
-        <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
-          <ThemedText size="small" tone="muted">Palavras: {words}/20</ThemedText>
-          {overLimit && <ThemedText size="small" weight="800" tone="danger">Limite excedido</ThemedText>}
+        <View style={{ flex: 1, justifyContent: 'center' }}>
+          <View style={{ marginBottom: spacing(4) }}>
+            <ThemedText size="body" style={{ textAlign: 'center', marginTop: spacing(1) }}>
+              <ThemedText size="body" style={{ fontStyle: 'italic' }}>
+                Faça o seu
+              </ThemedText>
+              {' '}pedido aqui e agora!
+            </ThemedText>
+          </View>
+          
+          <View
+            style={{
+              backgroundColor: colors.surface,
+              borderColor: colors.border,
+              borderWidth: 1,
+              borderRadius: radius.md,
+              padding: spacing(4),
+              gap: spacing(3),
+            }}
+          >
+            <ThemedText tone="muted">
+              Descreva seu pedido em até <ThemedText weight="800">20 palavras</ThemedText>. Ex.: "agradecimento pela família e sabedoria nas decisões".
+            </ThemedText>
+            <TextInput
+              value={prayerText}
+              onChangeText={handleTextChange}
+              placeholder="Escreva aqui seu pedido em até 20 palavras..."
+              placeholderTextColor={colors.textMuted}
+              multiline
+              style={{
+                minHeight: 100,
+                borderRadius: radius.sm,
+                borderWidth: 1,
+                borderColor: colors.border,
+                padding: spacing(3),
+                color: colors.text,
+                backgroundColor: '#f9fafb',
+                textAlignVertical: 'top',
+              }}
+            />
+            <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
+              <ThemedText size="small" tone="muted">Palavras: {countWords(prayerText)}/20</ThemedText>
+              {countWords(prayerText) > 20 && <ThemedText size="small" weight="800" tone="danger">Limite excedido</ThemedText>}
+            </View>
+            {error && (
+              <View style={{
+                backgroundColor: colors.dangerBg,
+                borderColor: colors.border,
+                borderWidth: 1, borderRadius: radius.md, padding: spacing(3)
+              }}>
+                <ThemedText tone="danger">⚠️ {error}</ThemedText>
+              </View>
+            )}
+            {!loading ? (
+              <View style={{ flexDirection: 'row', gap: spacing(3), flexWrap: 'wrap' }}>
+                <Primary title="Gerar Oração" onPress={onGenerate} disabled={countWords(prayerText) > 20 || !prayerText.trim()} />
+                <Secondary title="Limpar" onPress={onClear} />
+              </View>
+            ) : (
+              <View style={{ flexDirection: 'row', gap: spacing(3), alignItems: 'center' }}>
+                <ActivityIndicator />
+                <ThemedText tone="muted">Gerando sua oração...</ThemedText>
+              </View>
+            )}
+          </View>
         </View>
-        {error && (
-          <View style={{
-            backgroundColor: colors.dangerBg,
-            borderColor: colors.border,
-            borderWidth: 1, borderRadius: radius.md, padding: spacing(3)
-          }}>
-            <ThemedText tone="danger">⚠️ {error}</ThemedText>
-          </View>
-        )}
-        {!loading ? (
-          <View style={{ flexDirection: 'row', gap: spacing(3), flexWrap: 'wrap' }}>
-            <Primary title="Gerar Oração" onPress={onGenerate} disabled={overLimit || !input.trim()} />
-            <Secondary title="Limpar" onPress={onClear} />
-          </View>
-        ) : (
-          <View style={{ flexDirection: 'row', gap: spacing(3), alignItems: 'center' }}>
-            <ActivityIndicator />
-            <ThemedText tone="muted">Gerando sua oração...</ThemedText>
-            <Secondary title="Cancelar" onPress={onCancel} />
-          </View>
-        )}
-      </View>
       )}
+
       {result && (
         <View
           style={{
@@ -203,7 +221,14 @@ export default function PersonalizadaScreen() {
             gap: spacing(3),
           }}
         >
-          <ThemedText style={{ lineHeight: 22 }}>{result}</ThemedText>
+          <ThemedText style={{ lineHeight: 24, textAlign: 'justify' }}>
+            {result.split('\n').map((line, index) => (
+              <ThemedText key={index} style={{ lineHeight: 24, textAlign: 'justify' }}>
+                {line}
+                {index < result.split('\n').length - 1 && '\n'}
+              </ThemedText>
+            ))}
+          </ThemedText>
           <View style={{ flexDirection: 'row', gap: spacing(3), flexWrap: 'wrap' }}>
             <Secondary title="Copiar" onPress={onCopy} />
             <Secondary title="Compartilhar" onPress={onShare} />
@@ -235,9 +260,10 @@ export default function PersonalizadaScreen() {
       </Pressable>
     </ScrollView>
   );
+
   function Primary({ title, onPress, disabled }: { title: string; onPress?: () => void; disabled?: boolean }) {
     return (
-      <Pressable
+      <TouchableOpacity
         onPress={disabled ? undefined : onPress}
         style={({ pressed }) => ({
           backgroundColor: disabled ? '#93c5fd' : (pressed ? '#1d4ed8' : colors.primary),
@@ -247,12 +273,13 @@ export default function PersonalizadaScreen() {
         })}
       >
         <ThemedText weight="800" style={{ color: colors.primaryText }}>{title}</ThemedText>
-      </Pressable>
+      </TouchableOpacity>
     );
   }
+
   function Secondary({ title, onPress }: { title: string; onPress?: () => void }) {
     return (
-      <Pressable
+      <TouchableOpacity
         onPress={onPress}
         style={({ pressed }) => ({
           backgroundColor: pressed ? '#e5e7eb' : colors.surface,
@@ -264,7 +291,7 @@ export default function PersonalizadaScreen() {
         })}
       >
         <ThemedText weight="800">{title}</ThemedText>
-      </Pressable>
+      </TouchableOpacity>
     );
   }
 }
