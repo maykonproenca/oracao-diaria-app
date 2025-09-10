@@ -1,9 +1,9 @@
 import { router } from 'expo-router';
 import React, { useEffect } from 'react';
-import { Dimensions, StyleSheet, View } from 'react-native';
+import { StyleSheet, View } from 'react-native';
 import { ThemedText } from './ThemedText';
 
-const { width, height } = Dimensions.get('window');
+// const { width, height } = Dimensions.get('window'); // Removido - não utilizado
 
 export function SplashScreenFallback() {
   useEffect(() => {

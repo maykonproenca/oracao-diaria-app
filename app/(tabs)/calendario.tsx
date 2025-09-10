@@ -13,7 +13,8 @@ import { ActivityIndicator, Pressable, RefreshControl, ScrollView, View } from '
 
 export default function CalendarioScreen() {
   const { colors, radius, spacing } = useTheme();
-  const { stats, refreshStats } = usePrayerUpdates();
+  const { stats } = usePrayerUpdates();
+  // const { refreshStats } = usePrayerUpdates(); // Removido - não utilizado
 
   const [viewDate, setViewDate] = useState<Date>(new Date());
   const [loading, setLoading] = useState(true);

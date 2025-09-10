@@ -11,9 +11,11 @@ import { formatHuman } from '@/utils/date';
 import React, { useCallback } from 'react';
 import { ActivityIndicator, RefreshControl, ScrollView, View } from 'react-native';
 export default function IndexScreen() {
-  const { loading, error, data, stats, actionLoading, reload, complete } = useTodayPrayer();
+  const { loading, error, data, actionLoading, reload, complete } = useTodayPrayer();
   const { refreshStats } = usePrayerUpdates();
-  const { colors, spacing, radius } = useTheme();
+  const { colors, spacing } = useTheme();
+  // const { stats } = useTodayPrayer(); // Removido - não utilizado
+  // const { radius } = useTheme(); // Removido - não utilizado
   const toast = useToast();
   const onComplete = useCallback(async () => {
     try {
@@ -78,7 +80,7 @@ export default function IndexScreen() {
       {!data?.prayer?.content && (
         <View style={{ padding: spacing(3) }}>
           <ThemedText tone="muted" size="small">
-            Dica: insira orações na tabela "prayers" ou importe um seed inicial.
+            Dica: insira orações na tabela &quot;prayers&quot; ou importe um seed inicial.
           </ThemedText>
         </View>
       )}

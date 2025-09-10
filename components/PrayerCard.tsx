@@ -23,7 +23,8 @@ export default function PrayerCard({
   onComplete,
   onShareWhatsApp,
 }: Props) {
-  const { colors, radius, spacing, shadow, text } = useTheme();
+  const { colors, radius, spacing, shadow } = useTheme();
+  // const { text } = useTheme(); // Removido - não utilizado
 
   return (
     <View
@@ -83,27 +84,29 @@ function PrimaryButton({ label, onPress, disabled }: { label: string; onPress?: 
   );
 }
 
-function SecondaryButton({ label, onPress }: { label: string; onPress?: () => void }) {
-  const { colors, radius, spacing } = useTheme();
-  return (
-    <Pressable
-      onPress={onPress}
-      style={({ pressed }) => ({
-        backgroundColor: pressed ? '#e5e7eb' : colors.surface,
-        paddingVertical: spacing(3),
-        paddingHorizontal: spacing(4),
-        borderRadius: radius.sm,
-        borderWidth: 1,
-        borderColor: colors.border,
-      })}
-    >
-      <ThemedText weight="800">{label}</ThemedText>
-    </Pressable>
-  );
-}
+// Função não utilizada - comentada
+// function SecondaryButton({ label, onPress }: { label: string; onPress?: () => void }) {
+//   const { colors, radius, spacing } = useTheme();
+//   return (
+//     <Pressable
+//       onPress={onPress}
+//       style={({ pressed }) => ({
+//         backgroundColor: pressed ? '#e5e7eb' : colors.surface,
+//         paddingVertical: spacing(3),
+//         paddingHorizontal: spacing(4),
+//         borderRadius: radius.sm,
+//         borderWidth: 1,
+//         borderColor: colors.border,
+//       })}
+//     >
+//       <ThemedText weight="800">{label}</ThemedText>
+//     </Pressable>
+//   );
+// }
 
 function WhatsAppButton({ onPress }: { onPress: () => void }) {
-  const { colors, radius, spacing } = useTheme();
+  const { radius, spacing } = useTheme();
+  // const { colors } = useTheme(); // Removido - não utilizado
   return (
     <View style={{ alignItems: 'center' }}>
       <Pressable

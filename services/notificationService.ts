@@ -59,7 +59,6 @@ export async function scheduleDailyReminder(hour: number, minute: number): Promi
       type: Notifications.SchedulableTriggerInputTypes.DAILY,
       hour,
       minute,
-      repeats: true, // repete todos os dias neste horário
       channelId: Platform.OS === 'android' ? ANDROID_CHANNEL_ID : undefined,
     },
   });

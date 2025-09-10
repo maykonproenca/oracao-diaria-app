@@ -115,7 +115,7 @@ export default function NotificacoesScreen() {
           toast.show({ type: 'error', message: 'Permissão negada. As notificações permanecerão desativadas.' });
           return; // Não ativa o switch se a permissão foi negada
         }
-      } catch (e: any) {
+      } catch {
         toast.show({ type: 'error', message: 'Erro ao solicitar permissão. Tente novamente.' });
         return; // Não ativa o switch se houve erro
       }
@@ -304,7 +304,8 @@ function SecondaryButton({ title, onPress }: { title: string; onPress?: () => vo
 }
 
 function TimeStepper({ label, value, onInc, onDec }: { label: string; value: number; onInc: () => void; onDec: () => void; }) {
-  const { radius, spacing } = useTheme();
+  const { spacing } = useTheme();
+  // const { radius } = useTheme(); // Removido - não utilizado
   
   // Garantir que o valor seja sempre um número válido
   const validValue = typeof value === 'number' && !isNaN(value) ? value : 0;
@@ -323,8 +324,9 @@ function TimeStepper({ label, value, onInc, onDec }: { label: string; value: num
   );
 }
 
-function clampHour(h: number) { return Math.min(23, Math.max(0, Math.floor(h))); }
-function clampMinute(m: number) { return Math.min(59, Math.max(0, Math.floor(m))); }
+// Funções não utilizadas - comentadas
+// function clampHour(h: number) { return Math.min(23, Math.max(0, Math.floor(h))); }
+// function clampMinute(m: number) { return Math.min(59, Math.max(0, Math.floor(m))); }
 function wrapHour(h: number) { return (h + 24) % 24; }
 function wrapMinute(m: number) {
   let v = m;

@@ -536,7 +536,7 @@ export async function getUserSettings(): Promise<UserSettings> {
     let notification_schedules = null;
     if (r?.notification_schedules) {
       try {
-        notification_schedules = JSON.parse(r.notification_schedules);
+        notification_schedules = JSON.parse(r.notification_schedules as unknown as string);
       } catch (error) {
         console.warn('Erro ao fazer parse das configurações de notificação:', error);
       }

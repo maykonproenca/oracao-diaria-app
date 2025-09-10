@@ -5,7 +5,7 @@ import { buildShareMessage, copyToClipboard, shareSystem, shareWhatsApp } from '
 import { saveCustomPrayerToHistory } from '@/utils/db';
 import { router } from 'expo-router';
 import React, { useCallback, useState } from 'react';
-import { ActivityIndicator, Pressable, ScrollView, TextInput, TouchableOpacity, View } from 'react-native';
+import { ActivityIndicator, Pressable, ScrollView, TextInput, View } from 'react-native';
 
 export default function PedsScreen() {
   const { colors, spacing, radius } = useTheme();
@@ -163,7 +163,7 @@ export default function PedsScreen() {
             }}
           >
             <ThemedText tone="muted">
-              Descreva seu pedido em até <ThemedText weight="800">20 palavras</ThemedText>. Ex.: "agradecimento pela família e sabedoria nas decisões".
+              Descreva seu pedido em até <ThemedText weight="800">20 palavras</ThemedText>. Ex.: &quot;agradecimento pela família e sabedoria nas decisões&quot;.
             </ThemedText>
             <TextInput
               value={prayerText}
@@ -263,9 +263,9 @@ export default function PedsScreen() {
 
   function Primary({ title, onPress, disabled }: { title: string; onPress?: () => void; disabled?: boolean }) {
     return (
-      <TouchableOpacity
+      <Pressable
         onPress={disabled ? undefined : onPress}
-        style={({ pressed }) => ({
+        style={({ pressed }: { pressed: boolean }) => ({
           backgroundColor: disabled ? '#93c5fd' : (pressed ? '#1d4ed8' : colors.primary),
           paddingVertical: spacing(3),
           paddingHorizontal: spacing(4),
@@ -273,15 +273,15 @@ export default function PedsScreen() {
         })}
       >
         <ThemedText weight="800" style={{ color: colors.primaryText }}>{title}</ThemedText>
-      </TouchableOpacity>
+      </Pressable>
     );
   }
 
   function Secondary({ title, onPress }: { title: string; onPress?: () => void }) {
     return (
-      <TouchableOpacity
+      <Pressable
         onPress={onPress}
-        style={({ pressed }) => ({
+        style={({ pressed }: { pressed: boolean }) => ({
           backgroundColor: pressed ? '#e5e7eb' : colors.surface,
           paddingVertical: spacing(3),
           paddingHorizontal: spacing(4),
@@ -291,7 +291,7 @@ export default function PedsScreen() {
         })}
       >
         <ThemedText weight="800">{title}</ThemedText>
-      </TouchableOpacity>
+      </Pressable>
     );
   }
 }

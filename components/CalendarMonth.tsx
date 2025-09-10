@@ -20,7 +20,8 @@ const WEEKDAY_LABELS = [
 ];
 
 export default function CalendarMonth({ matrix }: Props) {
-  const { colors, spacing, radius, text } = useTheme();
+  const { colors, spacing, radius } = useTheme();
+  // const { text } = useTheme(); // Removido - não utilizado
   const today = new Date();
 
   return (

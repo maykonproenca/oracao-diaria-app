@@ -1,20 +1,21 @@
 // components/EnhancedPrayerCard.tsx
+import { Ionicons } from '@expo/vector-icons';
+import { LinearGradient } from 'expo-linear-gradient';
 import React, { useState } from 'react';
 import {
-  View,
-  Text,
-  StyleSheet,
-  TouchableOpacity,
-  Animated,
-  Dimensions,
+    Animated,
+    StyleSheet,
+    Text,
+    TextStyle,
+    TouchableOpacity,
+    View,
+    ViewStyle,
 } from 'react-native';
-import { LinearGradient } from 'expo-linear-gradient';
-import { Ionicons } from '@expo/vector-icons';
-import { NexusColors, NexusTypography, NexusSpacing, createNexusTheme } from '../constants/NexusTheme';
+import { NexusColors, NexusSpacing, NexusTypography, createNexusTheme } from '../constants/NexusTheme';
 import { useColorScheme } from '../hooks/useColorScheme';
 
-// Pegar o tamanho da tela do celular
-const { width } = Dimensions.get('window');
+// Pegar o tamanho da tela do celular (removido width não utilizado)
+// const { width } = Dimensions.get('window');
 
 // O que nosso card precisa para funcionar (como uma receita)
 interface EnhancedPrayerCardProps {
@@ -180,55 +181,28 @@ export const EnhancedPrayerCard: React.FC<EnhancedPrayerCardProps> = ({
 
 // Como cada parte deve parecer (como instruções de desenho)
 const styles = StyleSheet.create({
+  // Estilos para Views
   cardContainer: {
-    borderRadius: 20,           // Cantos arredondados
-    padding: NexusSpacing.xl,   // Espaço interno grande
-    marginVertical: NexusSpacing.lg,   // Espaço em cima e embaixo
-    marginHorizontal: NexusSpacing.md, // Espaço nas laterais
-    shadowColor: NexusColors.neutral[900], // Cor da sombra
+    backgroundColor: 'white',
+    borderRadius: 16,
+    padding: NexusSpacing.lg,
+    margin: NexusSpacing.md,
+    shadowColor: NexusColors.neutral[900],
     shadowOffset: {
       width: 0,
       height: 4,
     },
-    shadowOpacity: 0.1,         // Sombra clarinha
-    shadowRadius: 16,           // Sombra espalhada
-    elevation: 6,               // Sombra no Android
-    minHeight: 200,             // Altura mínima
-  },
-  
-  gradientCard: {
-    borderRadius: 20,
-    marginVertical: NexusSpacing.lg,
-    marginHorizontal: NexusSpacing.md,
-    shadowColor: NexusColors.primary[900],
-    shadowOffset: {
-      width: 0,
-      height: 6,
-    },
-    shadowOpacity: 0.2,
-    shadowRadius: 20,
-    elevation: 8,
-  },
-  
-  gradientOverlay: {
-    backgroundColor: 'rgba(255, 255, 255, 0.1)', // Clarinha por cima
-    borderRadius: 20,
-    padding: NexusSpacing.xl,
-    minHeight: 200,
-  },
+    shadowOpacity: 0.1,
+    shadowRadius: 12,
+    elevation: 5,
+  } as ViewStyle,
   
   header: {
-    flexDirection: 'row',        // Um do lado do outro
-    justifyContent: 'space-between', // Separados
-    alignItems: 'center',        // Alinhados no centro
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
     marginBottom: NexusSpacing.lg,
-  },
-  
-  title: {
-    fontSize: NexusTypography.sizes.h2,
-    fontWeight: NexusTypography.weights.bold,
-    flex: 1, // Ocupa o espaço disponível
-  },
+  } as ViewStyle,
   
   completedBadge: {
     flexDirection: 'row',
@@ -237,36 +211,22 @@ const styles = StyleSheet.create({
     paddingVertical: 6,
     borderRadius: 16,
     marginLeft: NexusSpacing.md,
-  },
-  
-  completedText: {
-    color: 'white',
-    fontSize: NexusTypography.sizes.caption,
-    fontWeight: NexusTypography.weights.medium,
-    marginLeft: 4,
-  },
+  } as ViewStyle,
   
   contentContainer: {
     flex: 1,
     justifyContent: 'center',
     marginBottom: NexusSpacing.lg,
-  },
-  
-  prayerText: {
-    fontSize: NexusTypography.sizes.body,
-    lineHeight: NexusTypography.sizes.body * NexusTypography.lineHeights.relaxed,
-    fontWeight: NexusTypography.weights.regular,
-    textAlign: 'justify', // Texto justificado
-  },
+  } as ViewStyle,
   
   actionsContainer: {
-    flexDirection: 'row',     // Botões um do lado do outro
-    gap: NexusSpacing.md,     // Espaço entre os botões
+    flexDirection: 'row',
+    gap: NexusSpacing.md,
     marginTop: NexusSpacing.lg,
-  },
+  } as ViewStyle,
   
   primaryButton: {
-    flex: 1,                  // Ocupa metade do espaço
+    flex: 1,
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
@@ -280,32 +240,65 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.1,
     shadowRadius: 8,
     elevation: 3,
-  },
-  
-  primaryButtonText: {
-    color: 'white',
-    fontSize: NexusTypography.sizes.subtitle,
-    fontWeight: NexusTypography.weights.semibold,
-  },
+  } as ViewStyle,
   
   secondaryButton: {
-    flex: 1,                  // Ocupa metade do espaço
+    flex: 1,
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
     paddingVertical: 16,
     borderRadius: 12,
-    borderWidth: 2,           // Borda de 2 pixels
-  },
+    borderWidth: 2,
+  } as ViewStyle,
+  
+  buttonIcon: {
+    marginRight: 8,
+  } as TextStyle,
+  
+  gradientCard: {
+    borderRadius: 16,
+    padding: NexusSpacing.lg,
+    margin: NexusSpacing.md,
+    overflow: 'hidden',
+  } as ViewStyle,
+  
+  gradientOverlay: {
+    flex: 1,
+    padding: NexusSpacing.lg,
+  } as ViewStyle,
+  
+  // Estilos para Text
+  title: {
+    fontSize: NexusTypography.sizes.h2,
+    fontWeight: '700' as const,
+    flex: 1,
+  } as TextStyle,
+  
+  completedText: {
+    color: 'white',
+    fontSize: NexusTypography.sizes.caption,
+    fontWeight: '500' as const,
+    marginLeft: 4,
+  } as TextStyle,
+  
+  prayerText: {
+    fontSize: NexusTypography.sizes.body,
+    lineHeight: NexusTypography.sizes.body * NexusTypography.lineHeights.relaxed,
+    fontWeight: '400' as const,
+    textAlign: 'justify',
+  } as TextStyle,
+  
+  primaryButtonText: {
+    color: 'white',
+    fontSize: NexusTypography.sizes.subtitle,
+    fontWeight: '600' as const,
+  } as TextStyle,
   
   secondaryButtonText: {
     fontSize: NexusTypography.sizes.subtitle,
-    fontWeight: NexusTypography.weights.semibold,
-  },
-  
-  buttonIcon: {
-    marginRight: 8,           // Espaço entre ícone e texto
-  },
+    fontWeight: '600' as const,
+  } as TextStyle,
 });
 
 export default EnhancedPrayerCard;

@@ -35,7 +35,7 @@ export default function TimePickerModal({
   // Inicializar com minutos ajustados
   React.useEffect(() => {
     setSelectedMinute(adjustMinuteToIncrement(selectedMinute));
-  }, [initialTime]);
+  }, [initialTime, selectedMinute]);
 
   const incrementHour = () => {
     setSelectedHour((prev) => (prev + 1) % 24);

@@ -39,7 +39,7 @@ export default function HistoricoScreen() {
       await deleteCustomPrayerFromHistory(id);
       await loadHistory();
       toast.show({ type: 'success', message: 'Oração removida do histórico' });
-    } catch (error) {
+    } catch {
       toast.show({ type: 'error', message: 'Erro ao remover oração' });
     }
   }, [loadHistory, toast]);
@@ -48,7 +48,7 @@ export default function HistoricoScreen() {
     try {
       await copyToClipboard(prayer);
       toast.show({ type: 'success', message: 'Oração copiada' });
-    } catch (error) {
+    } catch {
       toast.show({ type: 'error', message: 'Erro ao copiar oração' });
     }
   }, [toast]);
@@ -58,7 +58,7 @@ export default function HistoricoScreen() {
       const msg = buildShareMessage({ title: 'Oração personalizada', content: prayer, includeLink: true });
       await shareSystem(msg);
       toast.show({ type: 'success', message: 'Compartilhado!' });
-    } catch (error) {
+    } catch {
       toast.show({ type: 'error', message: 'Erro ao compartilhar' });
     }
   }, [toast]);
@@ -67,7 +67,7 @@ export default function HistoricoScreen() {
     try {
       const msg = buildShareMessage({ title: 'Oração personalizada', content: prayer, includeLink: true });
       await shareWhatsApp(msg);
-    } catch (error) {
+    } catch {
       toast.show({ type: 'error', message: 'Erro ao abrir WhatsApp' });
     }
   }, [toast]);
@@ -141,7 +141,7 @@ export default function HistoricoScreen() {
                     {formatHuman(new Date(item.created_at))}
                   </ThemedText>
                   <ThemedText size="body" weight="600" style={{ marginTop: spacing(1) }}>
-                    "{item.request}"
+                    &quot;{item.request}&quot;
                   </ThemedText>
                 </View>
                 <Pressable
